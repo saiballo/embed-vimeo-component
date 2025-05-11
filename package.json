@@ -1,0 +1,62 @@
+{
+	"name": "embed-vimeo-component",
+	"version": "1.0.0",
+	"description": "Boilerplate per lo sviluppo di prototipi statici. SASS e Esbuild si occupano di gestire la compilazione dei file css e javascript attraverso Gulp come task runner.",
+	"author": {
+		"name": "Lorenzo Saibal Forti",
+		"email": "lorenzo.forti@gmail.com"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/saiballo/embed-vimeo-component"
+	},
+	"engines": {
+		"node": ">=16.0.0"
+	},
+	"scripts": {
+		"gulp": "cross-env NODE_PREPROS=false gulp",
+		"gulp:assets:rev": "gulp revisioningAssets",
+		"gulp:assets:size": "gulp sizeAssets --silent",
+		"gulp:open": "cross-env NODE_PREPROS=false gulp --open",
+		"gulp:proxy": "cross-env NODE_PREPROS=false NODE_BROWSER_PROXY=true gulp --server=proxy",
+		"gulp:proxy:open": "cross-env NODE_PREPROS=false NODE_BROWSER_PROXY=true gulp --server=proxy --open",
+		"dev": "npm run gulp",
+		"dev:open": "npm run gulp:open",
+		"dev:proxy": "npm run gulp:proxy",
+		"dev:proxy:open": "npm run gulp:proxy:open",
+		"compile": "cross-env NODE_PREPROS=false gulp compile",
+		"compile:build": "cross-env NODE_ENV=production NODE_PREPROS=false gulp build && gulp copyEmbedVimeo && npm run gulp:assets:size",
+		"build": "npm run compile:build && npm run gulp:assets:rev",
+		"serve": "cross-env NODE_PREPROS=false NODE_ONLY_SERVE=true gulp serveStandalone",
+		"clean": "rm -rf ./docs/assets/css/* ./docs/assets/js/* ./docs/*.html",
+		"clean:css": "rm -rf ./docs/assets/css/*",
+		"clean:js": "rm -rf ./docs/assets/js/*",
+		"clean:all": "echo 'Sei sicuro di voler cancellare tutta la directory docs? [s/N]' && read -r risposta && [[ \"$risposta\" =~ ^[Ss]$ ]] && rm -rf docs || echo 'Operazione annullata'"
+	},
+	"devDependencies": {
+		"autoprefixer": "^10.4.21",
+		"browser-sync": "^3.0.3",
+		"cross-env": "^7.0.3",
+		"cssnano": "^7.0.6",
+		"del": "^8.0.0",
+		"esbuild": "^0.25.3",
+		"esbuild-minify-templates": "^0.11.1",
+		"esbuild-plugin-replace": "^1.4.0",
+		"fast-glob": "^3.3.3",
+		"gulp": "^5.0.0",
+		"gulp-plumber": "^1.2.1",
+		"gulp-postcss": "^10.0.0",
+		"gulp-rename": "^2.0.0",
+		"gulp-rev-all": "^4.0.0",
+		"gulp-sass": "^6.0.1",
+		"gulp-sass-glob-import": "^0.1.0",
+		"gulp-size": "^5.0.0",
+		"gulp-sourcemaps": "^3.0.0",
+		"micromatch": "^4.0.8",
+		"purgecss": "^7.0.2",
+		"sass": "^1.86.3",
+		"through2": "^4.0.2",
+		"yargs": "^17.7.2"
+	}
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+		<!-- <base href="/docs/"> -->
+		<meta charset="utf-8">
+		<title>Embed Vimeo</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="noindex, nofollow">
+
+		<!-- <style>
+			embed-vimeo::part(poster)
+			{
+				object-fit: contain;
+			}
+
+			embed-vimeo::part(play-button)
+			{
+				margin-block: 1rem;
+			}
+
+			embed-vimeo::part(spinner)
+			{
+				display: none;
+			}
+		</style> -->
+
+		<!-- <script type="module" src="assets/js/module/embed-vimeo.js"></script> -->
+		<script defer src="assets/js/embed-vimeo.min.js" data-autoplayx></script>
+
+		<script>
+			document.addEventListener("embedVimeoLoaded", (e) => {
+				console.log(e.target);
+				console.log("VideoId:", e.detail.videoId, "videoTitle:", e.detail.videoTitle, "posterUrl:", e.detail.posterUrl);
+			});
+		</script>
+
+    </head>
+
+    <body>
+
+		<!-- video container -->
+		<div style="width:100%; max-width:600px">
+			<embed-vimeo id="myVideo" video-id="347119375" video-title="my video" autopause poster-url="assets/img/poster.jpg"></embed-vimeo>
+		</div>
+		<!-- video container -->
+
+		<br>
+
+		<!-- video container -->
+		<div style="width:100%; max-width:600px">
+			<embed-vimeo video-id="449787858" video-title="my second video" autoload autoplay></embed-vimeo>
+		</div>
+		<!-- video container -->
+
+		<!-- <script>
+
+			setTimeout(() => {
+				const videoEl = document.getElementById("myVideo");
+				videoEl.setAttribute("video-id", "449787858");
+				videoEl.setAttribute("poster-fallback", "");
+				console.log("video aggiornato");
+			}, 2000);
+
+		</script> -->
+
+	</body>
+</html>
