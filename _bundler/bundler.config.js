@@ -52,7 +52,7 @@ const config = {
 	// revisioning per i file css e js dentro la cartella src. se true viene aggiunto un hash al nome del file
 	"fileRevisioning": false,
 	// rimuovere i commenti "legal" in produzione dai file js
-	"removeLegalComments": false,
+	"removeLegalComments": true,
 	// log nel terminale
 	"showLog": true,
 	// attiva o meno autoprefixer

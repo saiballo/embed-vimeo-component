@@ -1,11 +1,10 @@
 /**
-* @preserve
 * Filename: setStyle.js
 *
 * Created: 30/04/2025 (16:26:32)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 11/05/2025 (20:02:41)
+* Last update: 12/05/2025 (12:22:16)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2024 - Tutti i diritti riservati
@@ -87,9 +86,9 @@ export const setStyle = () => {
 		{
 			width: 68px;
   			height: 38px;
-  			background-color: transparent;
   			border: none;
   			z-index: 1;
+  			background-color: transparent;
 			background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48' preserveAspectRatio='none'><rect width='68' height='48' rx='4' ry='4' fill='%23000'/><path d='M45 24 27 14v20' fill='%23fff'/></svg>");
  			background-repeat: no-repeat;
   			background-position: center;

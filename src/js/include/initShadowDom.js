@@ -1,11 +1,10 @@
 /**
-* @preserve
 * Filename: initShadowDom.js
 *
 * Created: 30/04/2025 (16:48:32)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 11/05/2025 (19:41:03)
+* Last update: 12/05/2025 (12:22:11)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -45,7 +44,7 @@ export const initShadowDom = (context) => {
 				</svg>
 			</div>
 			<picture id="${config.idPosterContainer}">
-				<img id="${config.idPosterImg}" part="poster" referrerpolicy="origin" loading="lazy" fetchpriority="low" alt="">
+				<img id="${config.idPosterImg}" part="poster" referrerpolicy="origin" loading="lazy" alt="">
 			</picture>
 			<button id="${config.idBtnPlay}" part="play-button" hidden></button>
 		</div>

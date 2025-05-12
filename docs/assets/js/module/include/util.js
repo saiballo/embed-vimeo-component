@@ -1,11 +1,10 @@
 /**
-* @preserve
 * Filename: util.js
 *
 * Created: 30/04/2025 (17:20:44)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 11/05/2025 (20:02:55)
+* Last update: 12/05/2025 (12:22:24)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - sss diritti riservati
@@ -57,7 +56,7 @@ export const missingVideoId = (context) => {
 	// se non c'è l'id del video allora non carico il component
 	if (!context.videoId || context.videoId === "") {
 
-		hideElem(context.shadowRoot.getElementById("spinner-container"), true);
+		hideElem(context.shadowRoot.getElementById(context.config.idSpinnerContainer), true);
 
 		const h2 = document.createElement("h2");
 		h2.id = "error-message";
@@ -79,8 +78,8 @@ export const missingVideoId = (context) => {
 export const injectSchema = (context) => {
 
 	const { config } = context;
-
 	const { videoId } = context;
+
 	const videoTitle = context.videoTitle || config.textVideoTitle;
 	const description = context.description || config.textVideoDescription;
 

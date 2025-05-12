@@ -5,7 +5,7 @@
 * Created: 08/05/2025 (12:55:59)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 11/05/2025 (20:02:35)
+* Last update: 12/05/2025 (12:22:33)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -15,7 +15,7 @@
 
 import { defaultConfig } from "./include/config.js";
 import { initShadowDom } from "./include/initShadowDom.js";
-import { preloadConnection, injectSchema, setLabel, fetchTimeout, hideElem, getVimeoPosterUrl, missingVideoId } from "./include/util.js";
+import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, getVimeoPosterUrl, fetchTimeout } from "./include/util.js";
 
 (() => {
 
@@ -343,6 +343,7 @@ import { preloadConnection, injectSchema, setLabel, fetchTimeout, hideElem, getV
 				this.setAttribute("poster-fallback", "");
 			}
 
+			// nascondo il play
 			hideElem(this.domPlayButton, true);
 			this.domPlayButton.setAttribute("aria-hidden", "true");
 

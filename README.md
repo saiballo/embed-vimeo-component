@@ -1,6 +1,6 @@
 # Embed Vimeo Web Component
 
-> Un webcomponent per includere video Vimeo nel proprio sito rispettando la normativa GDPR. Impostando alcuni parametri specifici è possibile non scaricare nulla dai server Vimeo fin quando l'utente non clicca Play sul video.
+> Un Web Component per includere video Vimeo nel proprio sito rispettando la normativa GDPR. Impostando alcuni parametri specifici è possibile non scaricare nulla dai server Vimeo fin quando l'utente non clicca Play sul video.
 >
 >
 

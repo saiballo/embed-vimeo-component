@@ -1,11 +1,10 @@
 /**
-* @preserve
 * Filename: config.js
 *
 * Created: 04/05/2025 (19:35:57)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 11/05/2025 (10:16:56)
+* Last update: 12/05/2025 (12:22:06)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
