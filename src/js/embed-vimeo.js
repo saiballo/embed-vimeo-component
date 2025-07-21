@@ -5,7 +5,7 @@
 * Created: 08/05/2025 (12:55:59)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 12/05/2025 (12:22:33)
+* Last update: 21/07/2025 (10:53:03)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -15,7 +15,7 @@
 
 import { defaultConfig } from "./include/config.js";
 import { initShadowDom } from "./include/initShadowDom.js";
-import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, getVimeoPosterUrl, fetchTimeout } from "./include/util.js";
+import { preloadConnection, injectSchema, setLabel, hideElem, normalizeVideoId, missingVideoId, getVimeoPosterUrl, fetchTimeout } from "./include/util.js";
 
 (() => {
 
@@ -45,7 +45,7 @@ import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, ge
 
 		static get observedAttributes() {
 
-			return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback"];
+			return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
 		}
 
 		connectedCallback() {
@@ -75,7 +75,11 @@ import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, ge
 
 		// get attributi locali del component
 		get videoId() {
-			return encodeURIComponent(this.getAttribute("video-id") || "");
+
+			const rawId = this.getAttribute("video-id") || "";
+			const id = normalizeVideoId(rawId);
+
+			return encodeURIComponent(id);
 		}
 
 		get videoTitle() {
@@ -123,6 +127,10 @@ import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, ge
 
 		get autoPlay() {
 			return this.hasAttribute("autoplay") || this.globalParam.hasAttribute("data-autoplay");
+		}
+
+		get mute() {
+			return this.hasAttribute("mute") || this.globalParam.hasAttribute("data-mute");
 		}
 
 		get autoPause() {
@@ -219,7 +227,7 @@ import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, ge
 				// gestione parametri
 				const noTRacking = this.noTracking ? 1 : 0;
 				const autoplay = this.autoPlay && this.autoLoad || !this.autoPlay && !this.autoLoad ? 1 : 0;
-				const mute = autoplay ? 1 : 0;
+				const muted = this.mute ? 1 : 0;
 				const startAt = this.videoStartAt;
 
 				videoParam = `dnt=${noTRacking}&transparent=1&title=0&${videoParam}&autoplay=${autoplay}`;
@@ -227,11 +235,11 @@ import { preloadConnection, injectSchema, setLabel, hideElem, missingVideoId, ge
 				// la gestione dell'autoplay di vimeo è diversa da youtube
 				if (autoplay && this.autoPlay) {
 
-					videoParam = `${videoParam}&muted=${mute}`;
+					videoParam = `${videoParam}&muted=1`;
 
 				} else {
 
-					videoParam = `${videoParam}&muted=0`;
+					videoParam = `${videoParam}&muted=${muted}`;
 				}
 
 				videoParam = `${videoParam}#t=${startAt}`;

@@ -4,7 +4,7 @@
 * Created: 04/05/2025 (19:35:57)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 12/05/2025 (12:22:06)
+* Last update: 21/07/2025 (12:11:13)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -23,7 +23,7 @@ export const defaultConfig = {
 	"activeIframeClass": "isactive",
 	"textVideoTitle": "Video da Vimeo",
 	"textVideoDescription": "Guarda questo video incorporato nel sito da Vimeo",
-	"textMissingVideoId": "ID video mancante",
+	"textMissingVideoId": "ID video errato o mancante",
 	"textBtn": "Riproduci",
 	"textVideo": "video",
 	"spinnerColor": "#ff0000",

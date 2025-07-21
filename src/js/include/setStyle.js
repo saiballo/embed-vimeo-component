@@ -4,7 +4,7 @@
 * Created: 30/04/2025 (16:26:32)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 12/05/2025 (12:22:16)
+* Last update: 21/07/2025 (12:35:11)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2024 - Tutti i diritti riservati
@@ -110,8 +110,14 @@ export const setStyle = () => {
 			position: absolute;
 			top: 50%;
 			left: 50%;
+			text-align: center;
 			transform: translate3d(-50%, -50%, 0);
 			cursor: inherit;
+		}
+
+		#error-message
+		{
+			width: 100%;
 		}
 
 		.isactive

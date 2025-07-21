@@ -4,7 +4,7 @@
 * Created: 30/04/2025 (17:20:44)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 12/05/2025 (12:22:24)
+* Last update: 21/07/2025 (10:49:44)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - sss diritti riservati
@@ -47,6 +47,45 @@ export const preloadConnection = (() => {
 })();
 
 /**
+ * The function `normalizeVideoId` takes a raw video ID or URL as input and returns the normalized video ID by extracting it from the URL if it's a Vimeo embed URL.
+ * @param rawid - it is the input value that may contain either a video ID or a video URL. The `normalizeVideoId` function is designed to extract and return the video
+ * ID from the input, whether it is provided as a direct ID or embedded within a URL. If the input is
+ * @returns it returns the normalized video ID extracted from the raw input. If the raw input is a URL containing a Vimeo ID, it extracts and returns the Vimeo video ID.
+ * If the raw input is already a video ID, it returns the same video ID after decoding it. If the raw input is empty or not a valid URL, an empty string is returned.
+ */
+export const normalizeVideoId = (rawid) => {
+
+	if (!rawid) return "";
+
+	const videoId = decodeURIComponent(rawid);
+	const isUrl = /^(?:https?:\/\/|www\.)/.test(rawid);
+
+	if (isUrl) {
+
+		// se è un URL di embed YouTube, prendo il parametro dell'id
+		if (videoId.includes("player.vimeo")) {
+
+			try {
+
+				const url = new URL(videoId);
+				const segments = url.pathname.split("/");
+				// l'ultimo segmento è sempre l'ID
+				return segments.pop() || "";
+
+			} catch {
+
+				return "";
+			}
+		}
+
+		return "";
+	}
+
+	// altrimenti è già l'ID
+	return videoId;
+};
+
+/**
  * The function `missingVideoId` checks if a video ID is provided and displays an error message if it is missing.
  * @param context - it contains information related to the current state or environment of the application.
  * @returns it returns a boolean value. It returns `true` if there is no `videoId` in the `context` object or if the `videoId` is an empty string, and it returns `false` otherwise.
@@ -62,6 +101,8 @@ export const missingVideoId = (context) => {
 		h2.id = "error-message";
 		h2.textContent = context.config.textMissingVideoId;
 		context.domContainer.appendChild(h2);
+
+		console.log(context.config.textMissingVideoId);
 
 		return true;
 	}

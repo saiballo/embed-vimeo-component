@@ -1,78 +1,83 @@
+> ### [Italian Version](./README-it.md)
+
 # Embed Vimeo Web Component
 
-> Un Web Component per includere video Vimeo nel proprio sito rispettando la normativa GDPR. Impostando alcuni parametri specifici è possibile non scaricare nulla dai server Vimeo fin quando l'utente non clicca Play sul video.
->
->
+> A Web Component to embed Vimeo videos on your website while complying with GDPR regulations. By setting some specific parameters, it's possible to download nothing from Vimeo servers until the user clicks Play on the video.
 
-&nbsp;
 ![](https://img.shields.io/badge/Made%20with%20love%20and-javascript-blue)
 [![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://lbesson.mit-license.org/)
 
-## Sommario
+## Table of Contents
 
 - [Demo](#demo)
-- [Caratteristiche](#caratteristiche)
-- [Installazione](#installazione)
-- [Parametri globali](#parametri-globali)
-- [Utilizzo web component](#utilizzo-web-component)
-- [Lista parametri](#lista-parametri)
-- [Configurazione di default](#configurazione-di-default)
+- [Features](#features)
+- [Installation](#installation)
+- [Global Parameters](#global-parameters)
+- [Web Component Usage](#web-component-usage)
+- [Parameter List](#parameter-list)
+- [Default Configuration](#default-configuration)
 - [GDPR](#gdpr)
-- [Eventi](#eventi)
-- [Stili CSS](#stili-css)
+- [Events](#events)
+- [CSS Styles](#css-styles)
 - [DevTeam](#devteam)
-- [Licenza](#license)
+- [License](#license)
 
 ## Demo
 
-[Pagina demo](https://saiballo.github.io/embed-vimeo-component/)
+[Demo Page](https://saiballo.github.io/embed-vimeo-component/)
 
-## Caratteristiche
+## Features
 
-* Web Component senza dipendenze esterne.
-* Possibilità di personalizzare l'erogazione del video utilizzando la lista dei parametri disponibili. Alcuni di questi possono essere impostati globalmente senza bisogno di doverli ripetere su ogni webcomponent.
-* Codice ottimizzato per il SEO / Rich Results attraverso l'erogazione di uno snippet Schema.org (JSON-LD).
-* Codice incapsulato per non interferire con il sito ospite.
-* Video responsive in formato 16:9
-* Possibilità di mostrare una immagine personalizzata (poster) per ogni video al posto di quella originale Vimeo. In caso di errore verrà mostrata una immagine di default in formato svg.
+* Web Component with no external dependencies.
+* Ability to customize video delivery using the list of available parameters. Some of these can be set globally without having to repeat them on each webcomponent.
+* Code optimized for SEO / Rich Results through the delivery of a Schema.org snippet (JSON-LD).
+* Encapsulated code that doesn't interfere with the host site.
+* Responsive video in 16:9 format
+* Ability to show a custom image (poster) for each video instead of the original Vimeo one. In case of error, a default SVG image will be shown.
 
-### Installazione
+### Installation
 
-È possibile installare lo script in 3 modi diversi. Per i dettagli sui parametri globali vedi sezione "Parametri globali".
+The script can be installed in 3 different ways. For details on global parameters see the "Global Parameters" section.
 
-1) Script in pagina del file compilato. In questo caso è possibile aggiungere alcuni data-* che verranno utilizzati come parametri globali.
+1) **In-page script of the compiled file**
+
+In this case, you can add some `data-*` attributes that will be used as global parameters.
 ```
 <script src="embed-vimeo.min.js"></script>
 ```
 
-2) Script in pagina del file sorgente con type "module". In questo caso non sarà possibile aggiungere data-* allo script come parametri globali ma potrà essere raggiunto lo stesso risultato aggiungendoli al tag **body** della vostra pagina.
+2) **In-page script of the module file**
 
-**N.B.** Utilizzando il file come modulo è necessario mettere nella stesso path del file anche la cartella "include". (vedi cartella /docs/assets/js/module)
+In this case, you use the source file with `type="module"` and it won't be possible to add `data-*` to the script as global parameters, but the same result can be achieved by adding them to the page's `body` tag.
+
+**N.B.** When using the file as a module, you need to put the `include` folder in the same path as the file. (see `/docs/assets/js/module` folder)
 ```
 <script type="module" src="module/embed-vimeo.js"></script>
 ```
 
-3) Importare lo script, come **"side-effect import"**, in qualsiasi altro entrypoint javascript. In questo caso i parametri globali andranno impostati sullo script "entrypoint" se non si utilizza type "module" oppure sul tag **body** se si imposta type "module".
+3) **Import the script as a "side-effect import"**
+
+You can import the code in any other javascript entrypoint. In this case, global parameters should be set on the "entrypoint" script (`<script>` tag) if you're not using `type="module"`, or on the `body` tag if you set `type="module"`.
 ```
 // script master.js
 import './embed-vimeo.js';
 ```
-### Parametri globali
+### Global Parameters
 
-Sono disponibili i seguenti parametri globali da inserire come data-*:
+The following global parameters are available to be inserted as data-*:
 
-* **data-autoload**: istanzia automaticamente l'iframe Vimeo per ogni video presente in pagina. GDPR compliant: No.
-* **data-autoplay**: funziona solo se **data-autoload** è impostato. Fa partire il video al caricamento della pagina in modalità muta (obbligatorio). GDPR compliant: No.
-* **data-autopause**: blocca il video quando il player esce dal viewport della pagina (esemmpio: scrollando la pagina).
-* **data-no-tracking**: imposta il video senza cookie di tracciamento.
-* **data-no-preconnect**: di default vengono inseriti dei tag "preconnect" per le risorse Vimeo. Con questo parametro i tag non vengono aggiunti (utile in quei casi in cui i codici sono già presenti nel codice del sito)
-* **data-no-schema**: non stampa lo schema JSON-LD per ogni video. Lo schema è utile sia per finalità SEO che di accessibilità.
+* **`data-autoload`**: automatically instantiates the Vimeo iframe for each video present on the page. GDPR compliant: No.
+* **`data-autoplay`**: only works if **data-autoload** is set. Starts the video when the page loads in muted mode (mandatory). GDPR compliant: No.
+* **`data-autopause`**: stops the video when the player exits the page viewport (example: scrolling the page).
+* **`data-no-tracking`**: sets the video without tracking cookies.
+* **`data-no-preconnect`**: by default, "preconnect" tags are inserted for Vimeo resources. With this parameter, the tags are not added (useful in cases where the codes are already present in the site code)
+* **`data-no-schema`**: doesn't print the JSON-LD schema for each video. The schema is useful for both SEO and accessibility purposes.
 
-Esempio di script con i parametri globali impostati:
+Example of script with global parameters set:
 
 ```
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 
 	<head>
 
@@ -88,11 +93,11 @@ Esempio di script con i parametri globali impostati:
 </html>
 ```
 
-Nel caso di script type "module" i parametri vanno impostati sul body della pagina:
+In the case of `type="module"` scripts, the parameters must be set on the page's `body`:
 
 ```
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 
 	<head>
 
@@ -108,9 +113,9 @@ Nel caso di script type "module" i parametri vanno impostati sul body della pagi
 </html>
 ```
 
-### Utilizzo web component
+### Web Component Usage
 
-Una volta caricato il javascript principale si può inserire uno o più web component in pagina. L'unico dato realmente obbligatorio è l'ID del video:
+Once the main javascript is loaded, you can insert one or more web components on the page. The only **truly required** data is the video ID:
 
 ```
 <embed-vimeo video-id="347119375"></embed-vimeo>
@@ -118,155 +123,160 @@ Una volta caricato il javascript principale si può inserire uno o più web comp
 <embed-vimeo video-id="449787858"></embed-vimeo>
 ```
 
-In questo caso specifico verrà mostrata la copertina ufficiale del video ma non verrà creato automaticamente l'iframe di Vimeo. Anche se al caricamento della pagina non c'è interazione dell'utente con il video, in questa modalità non si avrà piena adesione al GDPR perchè il poster del video è comunque scaricato dai server di Vimeo.
+In this specific case, the official video cover will be shown but the Vimeo iframe will not be created automatically. Even if there's no user interaction with the video when the page loads, this mode won't have full GDPR compliance because the video poster is still downloaded from Vimeo servers.
 
-Per avere una piena e totale compatibilità con la normativa GDPR si può impostare il tag "embed-vimeo" in questa maniera:
+To have full and complete GDPR compliance, you can set the `embed-vimeo` tag like this:
 
 ```
 <embed-vimeo video-id="347119375" poster-url="path/to/custom-poster.jpg"></embed-vimeo>
 ```
 
-In questo caso viene visualizzata una immagine custom. Se non si ha a disposizione una immagine per ogni video si può raggiungere lo stesso risultato in questa maniera:
+In this case, a custom image is displayed. If you don't have an image available for each video, you can achieve the same result like this:
 
 ```
 <embed-vimeo video-id="347119375" poster-fallback></embed-vimeo>
 ```
 
-Al posto del poster originale del video viene mostrata una immagine SVG già presente nel component.
-In tutti e due i casi appena visti, una volta che l'utente clicca "Play" si verifica una interazione consapevole e il video parte come in qualsiasi altro caso.
+Instead of the original video poster, an SVG image already present in the component is shown.
+In both cases just seen, once the user clicks "Play", a conscious interaction occurs and the video starts as in any other case.
 
-Un'altra opzione disponibile per migliorare ulteriormente la privacy dell'utente è utilizzare "do not track" messo a disposizione da Vimeo:
+Another option available to further improve user privacy is to use "do not track" provided by Vimeo:
 
 ```
 <embed-vimeo video-id="347119375" poster-url="path/to/custom-poster.jpg" no-tracking></embed-vimeo>
 ```
 
-In questo caso non verranno utilizzati script o cookie traccianti.
+In this case, no tracking scripts or cookies will be used.
 
-Di default i parametri dll'iframe passati a Vimeo sono gestiti in automatico dallo script. In caso si volesse utilizzare una lista parametri totalmente custom si può inserire l'attributo "param-list":
+By default, the iframe parameters passed to Vimeo are managed automatically by the script. If you want to use a completely custom parameter list, you can insert the `param-list` attribute:
 
 ```
 <embed-vimeo video-id="347119375" param-list="dnt=1&transparent=0&title=1&autoplay=1"></embed-vimeo>
 ```
 
-Questo potrebbe interferire con alcuni attributi come "autoload" e "autoplay" che non avrebbero effetto. Vedi tutti [tutti i parametri](https://help.vimeo.com/hc/en-us/articles/12426260232977-About-Player-parameters)
+> **Note:**: `param-list` might interfere with some attributes like "autoload" and "autoplay" which would have no effect. See all [all parameters](https://help.vimeo.com/hc/en-us/articles/12426260232977-About-Player-parameters).
 
-### Lista parametri
+### Parameter List
 
 <table style="width:100%; border-collapse: collapse;">
 	<thead>
 		<tr>
-			<th style="border: 1px solid #ddd; padding: 8px;">Parametro</th>
-			<th style="border: 1px solid #ddd; padding: 8px;">Descrizione</th>
+			<th style="border: 1px solid #ddd; padding: 8px;">Parameter</th>
+			<th style="border: 1px solid #ddd; padding: 8px;">Description</th>
 			<th style="border: 1px solid #ddd; padding: 8px;">Default</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">video-id</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">ID del video Vimeo da includere. Parametro obbligaotrio. Se vuoto o mancante verrà mostrato un messaggio di errore.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">ID of the Vimeo video to embed. Required parameter. If empty or missing, an error message will be shown.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">""</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">video-title</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica il titolo del video. Viene utilizzato sul testo del bottone e nello snippet di Schema.org.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">"Video Vimeo"</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the video title. Used on the button text and in the Schema.org snippet.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">"Vimeo Video"</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">description</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">La descrizione del video. Viene utilizzato nello snippet di Schema.org.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">"Guarda questo video incorporato nel sito da Vimeo"</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">The video description. Used in the Schema.org snippet.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">"Watch this video embedded in the site from Vimeo"</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">play-text</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica il testo alternativo e l'attributo "aria-label" sul bottone Play.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">"Riproduci"</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the alternative text and "aria-label" attribute on the Play button.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">"Play"</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">video-start-at</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">I secondo da cui far iniziare il video. Ad esempio "50" indica 50 secondi oppure "1m20s" sta per 1 minuto e 20 secondi</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">The second from which to start the video. For example "50" indicates 50 seconds or "1m20s" means 1 minute and 20 seconds</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">0</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">autoload</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Se impostato questo parametro, l'iframe Vimeo verrà inizializzato al caricamento della pagina. Il controllo viene fatto con un Observer. Se il video sarà fuori dal viewport della pagina verrà istanziato solo una volta visibile.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">If this parameter is set, the Vimeo iframe will be initialized when the page loads. The control is done with an Observer. If the video is outside the page viewport, it will be instantiated only when visible.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">autoload-margin</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica la distanza, in pixel o percentuale, per attivare l'Observer. Più la misura è grande (es. 1000px) e prima verrà attivato l'iframe del video quando ci si avvicina al component.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the distance, in pixels or percentage, to activate the Observer. The larger the measure (e.g. 1000px), the earlier the video iframe will be activated when approaching the component.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">0</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">autoplay</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Avvia il video al caricamento della pagina ma solo se è impostato anche l'attributo "autoload". Il video verrà sempre attivato senza audio.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Starts the video when the page loads but only if the "autoload" attribute is also set. The video will always be activated without audio.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">autopause</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Se il video è in riproduzione, questo parametro blocca automaticamente lo streaming se l'utente, scrollando la pagina, fa uscire il player dal viewport.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">If the video is playing, this parameter automatically stops the streaming if the user, by scrolling the page, makes the player exit the viewport.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid #ddd; padding: 8px;">mute</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Mutes the video audio when manually started by the user.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">no-lazyload</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Disabilita il caricamento "lazy" delle immagini originali del video (poster) oppure di quelle custome.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Disables "lazy" loading of original video images (poster) or custom ones.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">no-schema</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Disabilita il caricamento dello snippet Schema.org.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Disables loading of the Schema.org snippet.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">no-preconnect</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Disabilita l'inserimento dei tag "preconnect" legati ai domini Vimeo quando ci si sposta con il mouse sopra uno qualsiasi dei video.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Disables the insertion of "preconnect" tags related to Vimeo domains when hovering over any of the videos.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">poster-fallback</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Se impostato mostra una SVG come poster per il video. Il parametro ha priorità anche se viene impostato "poster-url"</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">If set, shows an SVG as poster for the video. This parameter has priority even if "poster-url" is set.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">poster-url</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Utilizza l'immagine passata come poster al posto di quelle originali del video. Può essere inserito un path o un url assoluto.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Uses the passed image as poster instead of the original video ones. A path or absolute URL can be inserted.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">poster-quality</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica la qualità di default da utilzzare per le immagini originali del video. Non ha effetto se viene impostato "poster-url" oppure "poster-fallback". Se l'immagine non viene trovata verrà utilizzato il poster SVG di default.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the default quality to use for original video images. Has no effect if "poster-url" or "poster-fallback" is set. If the image is not found, the default SVG poster will be used.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">"hqdefault"</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">poster-width</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica la larghezza dell'immagine poster richiesta a Vimeo</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the width of the poster image requested from Vimeo.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">1024</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">param-list</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Azzera la lista dei parametri utilizzati dallo script e passati a Vimeo in favore di quelli inseriti nell'attributo.</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Resets the list of parameters used by the script and passed to Vimeo in favor of those inserted in the attribute.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">spinnerColor</td>
-			<td style="border: 1px solid #ddd; padding: 8px;">Indica il colore dello spinner</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Indicates the spinner color.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">"#ff0000"</td>
 		</tr>
 	</tbody>
 </table>
 
-### Configurazione di default
+### Default Configuration
 
-Alcuni parametri di default, nella maggior parte dei casi sono testi, possono essere sovrascritti creando una variabile globale chiamata "embedVimeoConfig". La lista dei parametri che possono essere sovrascritti è la seguente:
+Some default parameters, which in most cases are texts, can be overridden by creating a global variable called `embedVimeoConfig`. The list of parameters that can be overridden is as follows:
 
 ```
 <script>
 	window.embedVimeoConfig = {
 		"activeIframeClass": "isactive",
-		"textVideoTitle": "Video da Vimeo",
-		"textVideoDescription": "Guarda questo video incorporato nel sito da Vimeo",
-		"textMissingVideoId": "ID video mancante",
-		"textBtn": "Riproduci",
+		"textVideoTitle": "Video from Vimeo",
+		"textVideoDescription": "Watch this video embedded in the site from Vimeo",
+		"textMissingVideoId": "Incorrect or missing video ID",
+		"textBtn": "Play",
 		"textVideo": "video",
 		"spinnerColor": "#ff0000",
 		"videoStartAt": 0,
@@ -278,7 +288,7 @@ Alcuni parametri di default, nella maggior parte dei casi sono testi, possono es
 
 ### GDPR
 
-Per essere completamente aderenti alla normativa GDPR (quando l'utente non ha ancora dato il consenso o lo ha rifiutato) è necessario non utilizzare **mai** il parametro "autoload" e non scaricare mai le immagini dal sito Vimeo. Per esempio questi 2 component sono validi anche senza consenso:
+To be completely compliant with GDPR regulations (when the user has not yet given consent or has refused it), you must **never** use the `autoload` parameter and never download images from the Vimeo site. For example, these 2 components are valid even without consent:
 
 ```
 <embed-vimeo video-id="347119375" poster-url="path/to/custom-poster.jpg"></embed-vimeo>
@@ -286,15 +296,15 @@ Per essere completamente aderenti alla normativa GDPR (quando l'utente non ha an
 <embed-vimeo video-id="449787858" poster-fallback></embed-vimeo>
 ```
 
-### Eventi
+### Events
 
-Quando viene creato l'iframe di un video (anche in modalità autload) viene emesso un evento con i seguenti dati relativi al video:
+When a video iframe is created (even in `autoload` mode), an event is emitted with the following data related to the video:
 
 * videoId
 * videoTitle
 * posterUrl
 
-Può essere intercettato con un eventListener delegato. Ciò significa che vale per 1 o più video nella stessa pagina:
+It can be intercepted with a delegated eventListener. This means it works for 1 or more videos on the same page:
 
 ```
 <script>
@@ -305,34 +315,36 @@ Può essere intercettato con un eventListener delegato. Ciò significa che vale 
 </script>
 ```
 
-È possibile aggiornare dinamicamente i componenti video modificando uno o più attributi in questa lista: "video-id", "video-title", "play-text", "poster-url", "poster-fallback". Esempio:
+You can dynamically update video components by modifying one or more attributes in this list: `video-id`, `video-title`, `play-text`, `poster-url`, `poster-fallback`, `mute`. Example:
 
 ```
 <script>
 	setTimeout(() => {
 		const videoEl = document.getElementById("myVideo1");
-		// cambia id del video
+		// change video id
 		videoEl.setAttribute("video-id", "449787858");
-		// rimuove eventuali copertine di vimeo e imposta il poster SVG
+		// set mute mode
+		videoEl.setAttribute("mute", "");
+		// remove any vimeo covers and set SVG poster
 		videoEl.setAttribute("poster-fallback", "");
-		console.log("video aggiornato");
+		console.log("video updated");
 	}, 1000);
 </script>
 ```
 
-### Stili CSS
+### CSS Styles
 
-Alcuni elementi del component sono disponibili per eventuali personalizzazioni CSS:
+Some component elements are available for possible CSS customizations:
 
 ```
 <style>
-	/* immagine poster del video */
+	/* video poster image */
 	embed-vimeo::part(poster)
 	{
 		object-fit: contain;
 	}
 
-	/* bottone play */
+	/* play button */
 	embed-vimeo::part(play-button)
 	{
 		margin-block: 1rem;
