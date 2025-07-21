@@ -69,6 +69,7 @@ The following global parameters are available to be inserted as data-*:
 * **`data-autoload`**: automatically instantiates the Vimeo iframe for each video present on the page. GDPR compliant: No.
 * **`data-autoplay`**: only works if **data-autoload** is set. Starts the video when the page loads in muted mode (mandatory). GDPR compliant: No.
 * **`data-autopause`**: stops the video when the player exits the page viewport (example: scrolling the page).
+* **`data-mute`**: Mutes the audio when the user manually plays the video.
 * **`data-no-tracking`**: sets the video without tracking cookies.
 * **`data-no-preconnect`**: by default, "preconnect" tags are inserted for Vimeo resources. With this parameter, the tags are not added (useful in cases where the codes are already present in the site code)
 * **`data-no-schema`**: doesn't print the JSON-LD schema for each video. The schema is useful for both SEO and accessibility purposes.
