@@ -28,7 +28,8 @@ const revAll = require("gulp-rev-all").default;
 const sass = require("gulp-sass")(require("sass"));
 const sassGlob = require("gulp-sass-glob-import");
 const sourcemaps = require("gulp-sourcemaps");
-const yargs = require("yargs");
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
 const { deleteAsync } = require("del");
 const { execSync } = require("child_process");
 
@@ -48,11 +49,10 @@ const fullCssPath = `${bundleConf.outputDir}/${bundleConf.outputDirAssets}/${bun
 // full js path
 const fullJsPath = `${bundleConf.outputDir}/${bundleConf.outputDirAssets}/${bundleConf.outputDirJs}`;
 
-
 /**
  * the `const cli = yargs...` block is using the "yargs" library to parse command line arguments. it defines two options
  */
-const cli = yargs
+const cli = yargs(hideBin(process.argv))
 	.option("open", {
 		"alias": "o",
 		"type": "boolean",
@@ -683,7 +683,14 @@ const serveProxy = (done) => {
 		"injectChanges": true,
 		"notify": showNotify,
 		"online": true,
-		"reloadOnRestart": true
+		"reloadOnRestart": true,
+		"reloadDebounce": bundleConf.delayReloadBrowserSync,
+		"scrollRestoreTechnique": "cookie",
+		"ghostMode": {
+			"clicks": false,
+			"scroll": false,
+			"forms": false
+		}
 	};
 
 	if (bundleConf.showErrorOverlay) {
@@ -716,7 +723,13 @@ const serveStandalone = (done) => {
 		"injectChanges": true,
 		"notify": isServeMode ? false : showNotify,
 		"online": true,
-		"reloadOnRestart": true
+		"reloadOnRestart": true,
+		"reloadDebounce": bundleConf.delayReloadBrowserSync,
+		"ghostMode": {
+			"clicks": false,
+			"scroll": false,
+			"forms": false
+		}
 	};
 
 	if (bundleConf.showErrorOverlay) {

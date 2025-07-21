@@ -13,6 +13,7 @@
  * Comments:
  */
 
+const alias = require("esbuild-plugin-alias");
 const esbuild = require("esbuild");
 const fg = require("fast-glob");
 const path = require("node:path");
@@ -86,6 +87,10 @@ const buildFile = async (entrypath) => {
 		// necessario per far funzionare minifyTemplate per i css
 		"write": false,
 		"plugins": [
+			// alias per jquery in caso servisse
+			alias({
+    			jquery: path.resolve(__dirname, `${bundleConf.outputDir}/${bundleConf.outputDirAssets}/vendor/jquery/jquery-3.7.1.min.js`)
+  			}),
 			replace({
 				"values": bundleUtil.getAllEnvironmentVar(),
 				"preventAssignment": true

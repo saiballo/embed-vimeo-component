@@ -69,6 +69,8 @@ const config = {
 	"soundOnError": true,
 	// durata notifica in ms
 	"errorOverlayTimeout": 35000,
+	// ritardo reload browserSync
+	"delayReloadBrowserSync": 100,
 	// ritardo caricamento browser quando c'è il rebundle di tutti i js. necessario perchè i js da ricompilare potrebbero essere molti
 	"delayPartialBuild": 600,
 	// environment
