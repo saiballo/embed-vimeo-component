@@ -5,7 +5,7 @@
 * Created: 08/05/2025 (12:55:59)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 21/07/2025 (10:53:03)
+* Last update: 22/07/2025 (15:15:14)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -41,36 +41,6 @@ import { preloadConnection, injectSchema, setLabel, hideElem, normalizeVideoId, 
 			this.globalParam = globalParamHook;
 			// inizializzo il codice e gli stili css
 			initShadowDom(this);
-		}
-
-		static get observedAttributes() {
-
-			return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
-		}
-
-		connectedCallback() {
-
-			// se non c'è l'id del video allora non carico il component
-			if (missingVideoId(this)) return;
-
-			// setup del componente
-			this.setupComponent();
-
-			// evento click per creare l'iframe
-			this.addEventListener("click", () => {
-
-				this.loadIframe();
-			});
-
-			// preload delle connessioni
-			this.addEventListener("pointerover", () => {
-
-				preloadConnection(this);
-
-			}, {
-
-				"once": true
-			});
 		}
 
 		// get attributi locali del component
@@ -157,6 +127,36 @@ import { preloadConnection, injectSchema, setLabel, hideElem, normalizeVideoId, 
 			return this.hasAttribute("poster-fallback");
 		}
 		// has attributi locali del component
+
+		static get observedAttributes() {
+
+			return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
+		}
+
+		connectedCallback() {
+
+			// se non c'è l'id del video allora non carico il component
+			if (missingVideoId(this)) return;
+
+			// setup del componente
+			this.setupComponent();
+
+			// evento click per creare l'iframe
+			this.addEventListener("click", () => {
+
+				this.loadIframe();
+			});
+
+			// preload delle connessioni
+			this.addEventListener("pointerover", () => {
+
+				preloadConnection(this);
+
+			}, {
+
+				"once": true
+			});
+		}
 
 		/**
 		 * The `setupComponent` sets up various properties and behaviors for a video component, including setting labels, custom posters, auto-loading iframes etc.

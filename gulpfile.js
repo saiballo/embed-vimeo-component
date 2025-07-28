@@ -778,7 +778,11 @@ const postBuild = async () => {
 	}
 };
 
-const copyEmbedVimeo = () => {
+/**
+ * The `copyModule` function copies JavaScript files from specific source directories to a destination directory using Gulp.
+ * @returns The `copyModule` function returns a Promise that resolves when both the `embedFile` and `includeFolder` tasks are completed.
+ */
+const copyModule = () => {
 
 	const embedFile = gulp.src("./src/js/embed-vimeo.js")
 		.pipe(gulp.dest(`${fullJsPath}/module`));
@@ -830,4 +834,4 @@ exports.serveProxy = serveProxy;
 exports.serveStandalone = serveStandalone;
 exports.revisioningAssets = revisioningAssets;
 exports.sizeAssets = sizeAssets;
-exports.copyEmbedVimeo = copyEmbedVimeo;
+exports.copyModule = copyModule;

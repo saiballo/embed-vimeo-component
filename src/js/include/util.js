@@ -4,7 +4,7 @@
 * Created: 30/04/2025 (17:20:44)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 21/07/2025 (10:49:44)
+* Last update: 27/07/2025 (11:24:14)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - sss diritti riservati
@@ -101,8 +101,6 @@ export const missingVideoId = (context) => {
 		h2.id = "error-message";
 		h2.textContent = context.config.textMissingVideoId;
 		context.domContainer.appendChild(h2);
-
-		console.log(context.config.textMissingVideoId);
 
 		return true;
 	}
