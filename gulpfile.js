@@ -190,16 +190,27 @@ const revisioningAssets = async () => {
 
 	if (bundleConf.fileRevisioning) {
 
+		// alcune cartelle (css o js) potrebbero non esistere. quindi faccio un controllo
+		const pathToProcess = [`${bundleConf.outputDir}/**/*.{html,php}`];
+
+		if (fs.existsSync(fullCssPath)) {
+
+			pathToProcess.push(`${fullCssPath}/**/*.min.css`);
+		}
+
+		if (fs.existsSync(fullJsPath)) {
+
+			pathToProcess.push(`${fullJsPath}/**/*.min.js`);
+		}
+
 		// con una promise genero i file revisionati e aggiungo il controllo sui file html e php
 		await new Promise((resolve, reject) => {
 
-			gulp.src([
-				`${bundleConf.outputDir}/**/*.{html,php}`,
-				`${fullCssPath}/**/*.css`,
-				`${fullJsPath}/**/*.js`
-			], {
+			gulp.src(pathToProcess, {
 				// con base gulp mantiene la struttura dei file a partire da quella cartella
-				"base": bundleConf.outputDir
+				"base": bundleConf.outputDir,
+				// permetto cartelle vuote
+				"allowEmpty": true
 			})
 				.pipe(revAll.revision({
 					// non voglio revisionare i file html e php

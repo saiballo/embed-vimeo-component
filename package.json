@@ -37,10 +37,10 @@
 	"devDependencies": {
 		"autoprefixer": "^10.4.21",
 		"browser-sync": "^3.0.4",
-		"cross-env": "^7.0.3",
+		"cross-env": "^10.0.0",
 		"cssnano": "^7.1.0",
 		"del": "^8.0.0",
-		"esbuild": "^0.25.6",
+		"esbuild": "^0.25.8",
 		"esbuild-minify-templates": "^0.12.0",
 		"esbuild-plugin-alias": "^0.2.1",
 		"esbuild-plugin-replace": "^1.4.0",
