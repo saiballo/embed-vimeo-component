@@ -265,7 +265,7 @@ const sizeAssets = () => {
 		}
 
 		return Promise.resolve(bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullCssPath} non trovata`, bundleConf.showLog));
-	}
+	};
 
 	// calcolo il peso dei file js
 	const sizeJsStream = () => {
@@ -282,7 +282,7 @@ const sizeAssets = () => {
 		}
 
 		return Promise.resolve(bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullCssPath} non trovata`, bundleConf.showLog));
-	}
+	};
 
 	return Promise.all([
 		sizeCssStream(),
@@ -350,7 +350,9 @@ const createSassCompileStream = (filelist, pluginlist, withmap = false) => {
 	// nessun file da elaborare
 	if (!filelist || filelist.length === 0) return null;
 
-	let stream = gulp.src(filelist, { "base": bundleConf.srcSass })
+	let stream = gulp.src(filelist, {
+		"base": bundleConf.srcSass
+	})
 		.pipe(plumber({ "errorHandler": errorHandler }));
 
 	// aggiungo sourcemaps solo se richiesto
@@ -507,7 +509,9 @@ const compileSass = (currentfile = null) => {
 	// se è in produzione o non ci sono file con sourcemaps, eseguo lo stream normale
 	if (bundleConf.isProduction || bundleConf.cssSourceMapOnlyFile.length === 0) {
 
-		return gulp.src(sassFileList, { "base": bundleConf.srcSass })
+		return gulp.src(sassFileList, {
+			"base": bundleConf.srcSass
+		})
 			.pipe(plumber({ "errorHandler": errorHandler }))
 			.pipe(bundleConf.isProduction ? bundleUtil.noop() : sourcemaps.init())
 			.pipe(sassGlob())
@@ -805,7 +809,7 @@ const copyModule = () => {
 		new Promise((resolve, reject) => embedFile.on("end", resolve).on("error", reject)),
 		new Promise((resolve, reject) => includeFolder.on("end", resolve).on("error", reject))
 	]);
-}
+};
 
 /**
  * The above code is a JavaScript code snippet that defines a Gulp task named `build`. This task is a series of steps that are executed in a specific order:
@@ -814,7 +818,9 @@ const build = gulp.series(
 	// compila i file scss e js
 	gulp.parallel(compileSass, compileJs),
 	// rimuove i file mappa ed eventualmente esegue purgecss
-	postBuild
+	postBuild,
+	// copio il file modulo nella docs
+	copyModule
 );
 
 /**
@@ -845,4 +851,3 @@ exports.serveProxy = serveProxy;
 exports.serveStandalone = serveStandalone;
 exports.revisioningAssets = revisioningAssets;
 exports.sizeAssets = sizeAssets;
-exports.copyModule = copyModule;

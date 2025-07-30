@@ -26,7 +26,7 @@
 		"dev:proxy": "npm run gulp:proxy",
 		"dev:proxy:open": "npm run gulp:proxy:open",
 		"compile": "cross-env NODE_PREPROS=false gulp compile",
-		"compile:build": "cross-env NODE_ENV=production NODE_PREPROS=false gulp build && gulp copyModule && npm run gulp:assets:size",
+		"compile:build": "cross-env NODE_ENV=production NODE_PREPROS=false gulp build && npm run gulp:assets:size",
 		"build": "npm run compile:build && npm run gulp:assets:rev",
 		"serve": "cross-env NODE_PREPROS=false NODE_ONLY_SERVE=true gulp serveStandalone",
 		"clean": "rm -rf ./docs/assets/css/* ./docs/assets/js/* ./docs/*.html",
