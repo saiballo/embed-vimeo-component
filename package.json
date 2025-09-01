@@ -1,7 +1,7 @@
 {
 	"name": "embed-vimeo-component",
-	"version": "1.0.0",
-	"description": "Boilerplate per lo sviluppo di prototipi statici. SASS e Esbuild si occupano di gestire la compilazione dei file css e javascript attraverso Gulp come task runner.",
+	"version": "1.1.2",
+	"description": "A Web Component to embed Vimeo videos on your website while complying with GDPR regulations. By setting some specific parameters, it's possible to download nothing from Vimeo servers until the user clicks Play on the video.",
 	"author": {
 		"name": "Lorenzo Saibal Forti",
 		"email": "lorenzo.forti@gmail.com"
