@@ -14,7 +14,7 @@
 - [Installation](#installation)
 - [Global Parameters](#global-parameters)
 - [Web Component Usage](#web-component-usage)
-- [Parameter List](#parameter-list)
+- [Properties List](#properties-list)
 - [Default Configuration](#default-configuration)
 - [GDPR](#gdpr)
 - [Events](#events)
@@ -157,12 +157,12 @@ By default, the iframe parameters passed to Vimeo are managed automatically by t
 
 > **Note:**: `param-list` might interfere with some attributes like "autoload" and "autoplay" which would have no effect. See all [all parameters](https://help.vimeo.com/hc/en-us/articles/12426260232977-About-Player-parameters).
 
-### Parameter List
+### Properties List
 
 <table style="width:100%; border-collapse: collapse;">
 	<thead>
 		<tr>
-			<th style="border: 1px solid #ddd; padding: 8px;">Parameter</th>
+			<th style="border: 1px solid #ddd; padding: 8px;">Properties</th>
 			<th style="border: 1px solid #ddd; padding: 8px;">Description</th>
 			<th style="border: 1px solid #ddd; padding: 8px;">Default</th>
 		</tr>

@@ -14,7 +14,7 @@
 - [Installazione](#installazione)
 - [Parametri globali](#parametri-globali)
 - [Utilizzo web component](#utilizzo-web-component)
-- [Lista parametri](#lista-parametri)
+- [Lista proprietà](#lista-proprieta)
 - [Configurazione di default](#configurazione-di-default)
 - [GDPR](#gdpr)
 - [Eventi](#eventi)
@@ -157,12 +157,12 @@ Di default i parametri dll'iframe passati a Vimeo sono gestiti in automatico dal
 
 > **Note:**: `param-list` potrebbe interferire con alcuni attributi come "autoload" e "autoplay" che non avrebbero effetto. Vedi tutti [tutti i parametri](https://help.vimeo.com/hc/en-us/articles/12426260232977-About-Player-parameters).
 
-### Lista parametri
+### Lista proprietà
 
 <table style="width:100%; border-collapse: collapse;">
 	<thead>
 		<tr>
-			<th style="border: 1px solid #ddd; padding: 8px;">Parametro</th>
+			<th style="border: 1px solid #ddd; padding: 8px;">Proprietà</th>
 			<th style="border: 1px solid #ddd; padding: 8px;">Descrizione</th>
 			<th style="border: 1px solid #ddd; padding: 8px;">Default</th>
 		</tr>
