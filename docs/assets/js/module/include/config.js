@@ -4,15 +4,13 @@
 * Created: 04/05/2025 (19:35:57)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 21/07/2025 (12:11:13)
+* Last update: 04/03/2026 (18:33:05)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
 *
 * Comments:
 */
-
-"use strict";
 
 export const defaultConfig = {
 	"idEmbedContainer": "embed-container",
@@ -29,5 +27,8 @@ export const defaultConfig = {
 	"spinnerColor": "#ff0000",
 	"videoStartAt": 0,
 	"posterQuality": 80,
-	"posterWidth": 1024
+	"posterWidth": 1024,
+	"playOnHiddenTab": false,
+	"noTracking": false,
+	"noSchema": false
 };

@@ -5,7 +5,7 @@
 * Created: 08/05/2025 (12:55:59)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 01/09/2025 (11:40:12)
+* Last update: 04/03/2026 (18:41:12)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -18,6 +18,12 @@ import { initShadowDom } from "./include/initShadowDom.js";
 import { preloadConnection, injectSchema, setLabel, hideElem, normalizeVideoId, missingVideoId, getVimeoPosterUrl, fetchTimeout } from "./include/util.js";
 
 class EmbedVimeo extends HTMLElement {
+
+	// instanza globale della classe
+	static instanceList = new Set();
+
+	// controllo globale dell'event listener visibility
+	static visibilityListenerInit = false;
 
 	constructor() {
 
@@ -84,6 +90,12 @@ class EmbedVimeo extends HTMLElement {
 	}
 	// get attributi locali del component
 
+	// has attributi globali
+	get globalPlayOnHidden() {
+		return this.globalParam.hasAttribute("data-play-hiddentab") || this.config.playOnHiddenTab;
+	}
+	// has attributi globali
+
 	// has attributi locali e globali del component
 	get autoLoad() {
 		return this.hasAttribute("autoload") || this.globalParam.hasAttribute("data-autoload");
@@ -102,11 +114,11 @@ class EmbedVimeo extends HTMLElement {
 	}
 
 	get noTracking() {
-		return this.hasAttribute("no-tracking") || this.globalParam.hasAttribute("data-no-tracking");
+		return this.hasAttribute("no-tracking") || this.globalParam.hasAttribute("data-no-tracking") || this.config.noTracking;
 	}
 
 	get noSchema() {
-		return this.hasAttribute("no-schema") || this.globalParam.hasAttribute("data-no-schema");
+		return this.hasAttribute("no-schema") || this.globalParam.hasAttribute("data-no-schema") || this.config.noSchema;
 	}
 
 	get noPreconnect() {
@@ -125,6 +137,22 @@ class EmbedVimeo extends HTMLElement {
 	static get observedAttributes() {
 
 		return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
+	}
+
+	static loadVisibilityListener() {
+
+		if (this.visibilityListenerInit === true) return;
+
+		this.visibilityListenerInit = true;
+
+		document.addEventListener("visibilitychange", () => {
+
+			if (document.hidden === false) return;
+
+			this.instanceList.forEach((instance) => {
+				instance.pauseVideo();
+			});
+		});
 	}
 
 	connectedCallback() {
@@ -150,6 +178,14 @@ class EmbedVimeo extends HTMLElement {
 
 			"once": true
 		});
+
+		// registra istanza singolo video su static. in alternativa va bene anche il nome della classe ma è meno flessibile: EmbedYouTube.instances
+		this.constructor.instanceList.add(this);
+
+		if (this.globalPlayOnHidden === false) {
+
+			this.constructor.loadVisibilityListener();
+		}
 	}
 
 	/**
@@ -201,7 +237,7 @@ class EmbedVimeo extends HTMLElement {
 		}
 
 		// creazione schema json per seo
-		if (!this.noSchema) {
+		if (this.noSchema === false) {
 
 			injectSchema(this);
 		}
@@ -251,7 +287,7 @@ class EmbedVimeo extends HTMLElement {
 	 */
 	loadIframe() {
 
-		if (!this.isIframeLoaded) {
+		if (this.isIframeLoaded === false) {
 
 			const iframeCode = this.createIframe();
 			this.domContainer.insertAdjacentHTML("beforeend", iframeCode);
@@ -287,7 +323,7 @@ class EmbedVimeo extends HTMLElement {
 
 			entryList.forEach((entry) => {
 
-				if (entry.isIntersecting && !this.isIframeLoaded) {
+				if (entry.isIntersecting && this.isIframeLoaded === false) {
 
 					preloadConnection(this);
 					this.loadIframe(true);
@@ -309,9 +345,13 @@ class EmbedVimeo extends HTMLElement {
 
 			entryList.forEach((entry) => {
 
-				if (!entry.isIntersecting) {
+				if (entry.isIntersecting === false) {
 
-					this.shadowRoot.querySelector("iframe")?.contentWindow?.postMessage("{\"method\": \"pause\"}", "*");
+					const msg = {
+						"method": "pause"
+					};
+
+					this.shadowRoot.querySelector("iframe")?.contentWindow?.postMessage(JSON.stringify(msg), "*");
 				}
 			});
 
@@ -320,6 +360,21 @@ class EmbedVimeo extends HTMLElement {
 		});
 
 		this.observerVideo.observe(this);
+	}
+
+	/**
+	 * The `pauseVideo` function sends a message to an embedded iframe to pause the video playing within it.
+	 * @returns If the `isIframeLoaded` property is `false`, the function will return early without executing the rest of the code.
+	 */
+	pauseVideo() {
+
+		if (this.isIframeLoaded === false) return;
+
+		const msg = {
+			"method": "pause"
+		};
+
+		this.shadowRoot.querySelector("iframe")?.contentWindow?.postMessage(JSON.stringify(msg), "*");
 	}
 
 	/**
@@ -472,7 +527,7 @@ class EmbedVimeo extends HTMLElement {
 		const videoId = attrname === "video-id" ? oldvalue : this.videoId;
 
 		// cancello eventuali json. lo faccio sempre perchè non so quale attributo possa essere cambiato. in ogni caso viene richiamata la setup che lo riscrive
-		if (!this.noSchema && this.querySelector(`#json-${videoId}`)) {
+		if (this.noSchema === false && this.querySelector(`#json-${videoId}`)) {
 
 			this.querySelector(`#json-${videoId}`).remove();
 		}
@@ -497,6 +552,7 @@ class EmbedVimeo extends HTMLElement {
 	 */
 	disconnectedCallback() {
 
+		this.constructor?.instanceList.delete(this);
 		this.observerIframe?.disconnect();
 		this.observerVideo?.disconnect();
 	}

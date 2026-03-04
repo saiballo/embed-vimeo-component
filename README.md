@@ -69,10 +69,11 @@ The following global parameters are available to be inserted as data-*:
 * **`data-autoload`**: automatically instantiates the Vimeo iframe for each video present on the page. GDPR compliant: No.
 * **`data-autoplay`**: only works if **data-autoload** is set. Starts the video when the page loads in muted mode (mandatory). GDPR compliant: No.
 * **`data-autopause`**: stops the video when the player exits the page viewport (example: scrolling the page).
-* **`data-mute`**: Mutes the audio when the user manually plays the video.
-* **`data-no-tracking`**: sets the video without tracking cookies.
+* **`data-mute`**: mutes the audio when the user manually plays the video.
 * **`data-no-preconnect`**: by default, "preconnect" tags are inserted for Vimeo resources. With this parameter, the tags are not added (useful in cases where the codes are already present in the site code)
 * **`data-no-schema`**: doesn't print the JSON-LD schema for each video. The schema is useful for both SEO and accessibility purposes.
+* **`data-no-tracking`**: sets the video without tracking cookies.
+* **`data-play-hiddentab`**: by default, a started video is automatically paused if the user moves the website tab to the background. Set this parameter to prevent videos from being paused when the browser tab changes.
 
 Example of script with global parameters set:
 
@@ -82,7 +83,7 @@ Example of script with global parameters set:
 
 	<head>
 
-		<script defer src="embed-vimeo.min.js" data-autoload data-autoplay data-autopause></script>
+		<script defer src="embed-vimeo.min.js" data-autoload data-autoplay data-autopause data-play-hiddentab></script>
 
 	</head>
 
@@ -219,6 +220,11 @@ By default, the iframe parameters passed to Vimeo are managed automatically by t
 			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
 		</tr>
 		<tr>
+			<td style="border: 1px solid #ddd; padding: 8px;">no-tracking</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Sets the video without tracking cookies.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
+		</tr>
+		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">no-lazyload</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">Disables "lazy" loading of original video images (poster) or custom ones.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">not set</td>
@@ -282,7 +288,10 @@ Some default parameters, which in most cases are texts, can be overridden by cre
 		"spinnerColor": "#ff0000",
 		"videoStartAt": 0,
 		"posterQuality": 80,
-		"posterWidth": 1024
+		"posterWidth": 1024,
+		"playOnHiddenTab": false,
+		"noTracking": false,
+		"noSchema": false
 	};
 </script>
 ```

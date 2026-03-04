@@ -25,7 +25,7 @@
 		</style> -->
 
 		<!-- <script type="module" src="assets/js/module/embed-vimeo.js"></script> -->
-		<script defer src="assets/js/embed-vimeo.min.js" data-autoplayx></script>
+		<script defer src="assets/js/embed-vimeo.min.js"></script>
 
 		<script>
 			document.addEventListener("embedVimeoLoaded", (e) => {
@@ -38,8 +38,11 @@
 
     <body>
 
+		<p style="margin-bottom:0">All videos stop when the browser tab visibility changes</p>
+
 		<!-- video container -->
 		<div style="width:100%; max-width:600px">
+			<p style="margin-bottom:0">No muted video with autopause (you need to scroll the page). You must press Play.</p>
 			<embed-vimeo id="myVideo" video-id="347119375" video-title="my video" autopause poster-url="assets/img/poster.jpg"></embed-vimeo>
 		</div>
 		<!-- video container -->
@@ -48,9 +51,13 @@
 
 		<!-- video container -->
 		<div style="width:100%; max-width:600px">
-			<embed-vimeo video-id="449787858" video-title="my second video" autoload autoplay></embed-vimeo>
+			<p style="margin-bottom:0">Autoplay video (muted as default) and autopause</p>
+			<embed-vimeo video-id="449787858" video-title="my second video" autoload autoplay autopause></embed-vimeo>
 		</div>
 		<!-- video container -->
+
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 		<!-- <script>
 

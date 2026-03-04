@@ -4,7 +4,7 @@
 * Created: 30/04/2025 (17:20:44)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 27/07/2025 (11:24:14)
+* Last update: 04/03/2026 (18:47:17)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - sss diritti riservati
@@ -177,13 +177,12 @@ export const hideElem = (btn, hide = true, timeout = 250) => {
 	if (hide) {
 
 		btn.hidden = true;
-
-	} else {
-
-		setTimeout(() => {
-			btn.hidden = false;
-		}, timeout);
+		return;
 	}
+
+	setTimeout(() => {
+		btn.hidden = false;
+	}, timeout);
 };
 
 /**

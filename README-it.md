@@ -70,9 +70,10 @@ Sono disponibili i seguenti parametri globali da inserire come data-*:
 * **`data-autoplay`**: funziona solo se **data-autoload** è impostato. Fa partire il video al caricamento della pagina in modalità muta (obbligatorio). GDPR compliant: No.
 * **`data-autopause`**: blocca il video quando il player esce dal viewport della pagina (esemmpio: scrollando la pagina).
 * **`data-mute`**: imposta a muto l'audio del video quando viene fatto partire manualmente dall'utente.
-* **`data-no-tracking`**: imposta il video senza cookie di tracciamento.
 * **`data-no-preconnect`**: di default vengono inseriti dei tag "preconnect" per le risorse Vimeo. Con questo parametro i tag non vengono aggiunti (utile in quei casi in cui i codici sono già presenti nel codice del sito)
 * **`data-no-schema`**: non stampa lo schema JSON-LD per ogni video. Lo schema è utile sia per finalità SEO che di accessibilità.
+* **`data-no-tracking`**: imposta il video senza cookie di tracciamento.
+* **`data-play-hiddentab`**: di default un video avviato viene bloccato automaticamente se l'utente mette la TAB del sito in secondo piano. Impostare questo parametro per non bloccare i video al cambio TAB del browser.
 
 Esempio di script con i parametri globali impostati:
 
@@ -82,7 +83,7 @@ Esempio di script con i parametri globali impostati:
 
 	<head>
 
-		<script defer src="embed-vimeo.min.js" data-autoload data-autoplay data-autopause></script>
+		<script defer src="embed-vimeo.min.js" data-autoload data-autoplay data-autopause data-play-hiddentab></script>
 
 	</head>
 
@@ -219,6 +220,11 @@ Di default i parametri dll'iframe passati a Vimeo sono gestiti in automatico dal
 			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
 		</tr>
 		<tr>
+			<td style="border: 1px solid #ddd; padding: 8px;">no-tracking</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">Imposta il video senza cookie di tracciamento.</td>
+			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
+		</tr>
+		<tr>
 			<td style="border: 1px solid #ddd; padding: 8px;">no-lazyload</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">Disabilita il caricamento "lazy" delle immagini originali del video (poster) oppure di quelle custome.</td>
 			<td style="border: 1px solid #ddd; padding: 8px;">non impostato</td>
@@ -282,7 +288,10 @@ Alcuni parametri di default, nella maggior parte dei casi sono testi, possono es
 		"spinnerColor": "#ff0000",
 		"videoStartAt": 0,
 		"posterQuality": 80,
-		"posterWidth": 1024
+		"posterWidth": 1024,
+		"playOnHiddenTab": false,
+		"noTracking": false,
+		"noSchema": false
 	};
 </script>
 ```
