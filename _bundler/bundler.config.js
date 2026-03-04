@@ -2,13 +2,13 @@
  * @preserve
  * Filename: bundler.config.js
  *
- * Created: 05/05/2025 (12:19:26)
+ * Created: 04/03/2026 (17:54:36)
  * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Last Updated: 05/05/2025 (12:19:26)
+ * Last Updated: 04/03/2026 (17:54:36)
  * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Copyleft: 2025 - Tutti i diritti riservati
+ * Copyleft: 2026 - Tutti i diritti riservati
  *
  * Comments:
  */
@@ -52,7 +52,7 @@ const config = {
 	// revisioning per i file css e js dentro la cartella src. se true viene aggiunto un hash al nome del file
 	"fileRevisioning": false,
 	// rimuovere i commenti "legal" in produzione dai file js
-	"removeLegalComments": true,
+	"removeLegalComments": false,
 	// log nel terminale
 	"showLog": true,
 	// attiva o meno autoprefixer
@@ -63,53 +63,58 @@ const config = {
 	"minifyFileProd": true,
 	// purge dei file in prod mode
 	"purgeCssOnBuild": true,
+	// purge file delle classi cancellate (se true crea un file con le classi cancellate. utile per debug)
+	"purgeFileRemovedCLass": false,
+	// cartella nella root dove scrivere il file purgeRemoveClass
+	"purgeFileRemovedFolder": "_purged-report",
 	// mostra errori compilazione sass a video
-	"showErrorOverlay": true,
+	"showNotify": true,
 	// abilita suono nel terminale
 	"soundOnError": true,
 	// durata notifica in ms
-	"errorOverlayTimeout": 35000,
+	"notifyTimeout": 35000,
 	// ritardo reload browserSync
-	"delayReloadBrowserSync": 100,
+	"delayReloadBrowserSync": 200,
 	// ritardo caricamento browser quando c'è il rebundle di tutti i js. necessario perchè i js da ricompilare potrebbero essere molti
 	"delayPartialBuild": 600,
 	// environment
 	"isProduction": process.env.NODE_ENV === "production",
-	// configurazione comune ai 2 tipi di server
-	get "serverCommon"() {
+	// ottengo i file osservati a partire dalla cartella output del config
+	get "observedFilePath"() {
 
 		const {outputDir} = this;
 
 		return {
 			// array dei file da osservare per ricaricamento browser. se lasciato array vuoto varrà ["./dist/**/*"] (tutti i file)
-			"observedFilePath": [`${outputDir}/**/*.html`, `${outputDir}/**/*.php`, "./src/data/**/*.json"],
-			// durata delle notifiche di browser-sync
-			"showNotify": true,
-			"timeNotify": 10000
+			"observedFilePath": [`${outputDir}/**/*.html`, `${outputDir}/**/*.php`, "./src/data/**/*.json"]
 		};
 	},
-	// configurazione server proxy per utilizzo con apache o nginx
+	// configurazione server proxy per utilizzo con apache o nginx. lasciare l'url in http://
+	// per https è necessario un virtualhost dedicato (es. bundler.localhost) che faccia reverse proxy sulla porta indicata da "port"
 	get "proxy"() {
 
 		return {
 			"url": "http://localhost",
-			"baseDir": "FOLDER_NAME",
-			"port": 8850
+			"baseDir": "FOLDER_DIST",
+			// in genere non toccare startPath
+			"startPath": "/",
+			"port": 8850,
+			"showDir": true
 		};
 	},
 	// configurazione server builtin
 	get "server"() {
 
 		return {
-			"baseDir": "./",
+			"baseDir": this.outputDir,
 			"port": 8852,
-			"showDir": true
+			"showDir": false
 		};
 	},
 	// configurazione per PurgeCSS
 	get "purgeCssConfig"() {
 
-		const {outputDir, outputDirAssets, outputDirJs} = this;
+		const {outputDir, outputDirAssets, outputDirJs, purgeFileRemovedCLass} = this;
 
 		return {
 
@@ -126,11 +131,12 @@ const config = {
 				"deep": [/\.bs-.*$/, /.*after.*$/, /.*before.*$/, /bootbox.*$/, /.*spinner.*$/],
 				"greedy": [
 					/tooltip/,
-					/data-popper-placement/,
-					/data-bs-popper/,
-					/data-bs-target/
+					/data-bs-/,
+					/data-popper-/
 				]
-			}
+			},
+			// vedo se creare il file con le liste delle classi cancellate
+			"rejected": purgeFileRemovedCLass
 		};
 	},
 	// configurazione file sass e js da compilare. non è necessario modificare
@@ -164,7 +170,8 @@ const config = {
 		"color: white !important;",
 		"text-align: center !important;",
 		"max-width: 400px !important;",
-		"transition: all 0.5s ease !important;"
+		"transition: all 0.5s ease !important;",
+		"visibility: hidden !important;"
 	],
 	// solo per chi usa prepros. in genere non toccare
 	"prepros": {

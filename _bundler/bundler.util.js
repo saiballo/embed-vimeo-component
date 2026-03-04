@@ -2,13 +2,13 @@
  * @preserve
  * Filename: bundler.util.js
  *
- * Created: 05/05/2025 (12:19:26)
+ * Created: 04/03/2026 (17:54:36)
  * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Last Updated: 05/05/2025 (12:19:26)
+ * Last Updated: 04/03/2026 (17:54:36)
  * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Copyleft: 2025 - Tutti i diritti riservati
+ * Copyleft: 2026 - Tutti i diritti riservati
  *
  * Comments:
  */
@@ -278,25 +278,26 @@ const isInPartialFolder = (filepath, srcjspath, excludefolderlist) => {
 	// se il file non è sotto src/js, non è un file JS valido per noi
 	if (!normalizedPath.includes(normalizedSrcJsPath)) return false;
 
-	// ottengo il path esatto della cartella escludendo il src/js. quindi "include" è diverso da "fodler/include"
+	// ottengo il path esatto della cartella escludendo il src/js. quindi "include" è diverso da "folder/include"
 	const relativePath = path.relative(normalizedSrcJsPath, normalizedPath);
 	const folderPath = path.dirname(relativePath);
 	// serve per windows perchè il path di windows è con \ e non / e quindi path.sep sa su cosa splittare
 	const normalized = folderPath.split(path.sep).join("/");
-
 	// confronto preciso con la lista
-	return excludefolderlist.includes(normalized);
+	const folderSegments = normalized.split("/");
+
+	return folderSegments.some((segment) => excludefolderlist.includes(segment));
 };
 
 /**
  * The function `getObservedFilePath` returns an array of observed file paths based on the `bundleConf` object.
- * @returns If the `bundleConf.serverCommon.observedFilePath` is an array with a length greater than 0, then that array is being returned
+ * @returns If the `bundleConf.observedFilePath.observedFilePath` is an array with a length greater than 0, then that array is being returned
  */
 const getObservedFilePath = () => {
 
-	if (Array.isArray(bundleConf.serverCommon?.observedFilePath) && bundleConf.serverCommon.observedFilePath.length > 0) {
+	if (Array.isArray(bundleConf.observedFilePath?.observedFilePath) && bundleConf.observedFilePath.observedFilePath.length > 0) {
 
-		return bundleConf.serverCommon.observedFilePath;
+		return bundleConf.observedFilePath.observedFilePath;
 	}
 
 	return [`${bundleConf.outputDir}/**/*`];
@@ -327,33 +328,182 @@ const getAllEnvironmentVar = () => {
 };
 
 /**
+ * The function `getFirefoxScrollRestore` returns a script that sets scroll restoration to "manual" for Firefox browsers.
+ * @returns The function `getFirefoxOnlyScrollRestorationSnippet` returns a string containing a script that checks if the user agent is Firefox, and if so, sets the
+ * `history.scrollRestoration` to "manual" to control the scrolling behavior in Firefox browsers.
+ *
+ *  Firefox ha dei problemi nel restore dello scroll in alcuni contesti con browserSync. La funzione serve a risolvere il problema
+ */
+const getFirefoxScrollRestore = () => {
+	return `
+		<script>
+			(function () {
+				const userAgent = String(navigator.userAgent || "");
+				const isFirefox = (userAgent.indexOf("Firefox/") > -1);
+
+				if (isFirefox === false) return;
+
+				if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+			})();
+		</script>
+	`;
+};
+
+/**
+ * The function `getScrollRestore` returns a JavaScript snippet that saves and restores the scroll position of a webpage without smooth scrolling during page reload.
+ * @returns It returns a string containing a script that handles restoring the scroll position without smooth scrolling effect on page reload.
+ *
+ * disabilito la funzionalità nativa di browserSync e utilizzo uno snippet custom per ristabilire la posizione solo al reload della pagina
+ */
+const getScrollRestore = () => {
+	return `
+		<script>
+			(function () {
+
+				const storageKey = "bundlerScrollValue";
+				const cssClass = "bundler-no-smooth";
+				const styleId = "bundler-no-smooth-style";
+
+				// determina il tipo di navigazione
+				const getNavType = () => {
+
+					const entries = performance.getEntriesByType("navigation");
+
+					if (Array.isArray(entries) === false || entries.length === 0) return "navigate";
+
+					return String(entries[0].type || "navigate");
+				};
+
+				// assicura la regola CSS per disattivare lo smooth scroll
+				const noSmoothStyle = () => {
+
+					const existing = document.getElementById(styleId);
+
+					if (existing !== null) return;
+
+					const style = document.createElement("style");
+					style.id = styleId;
+					style.textContent ="html." + cssClass + ", html." + cssClass + " * { scroll-behavior: auto !important; }";
+
+					document.head.appendChild(style);
+				};
+
+				const addNoSmooth = () => {
+					document.documentElement.classList.add(cssClass);
+				};
+
+				const removeNoSmooth = () => {
+					document.documentElement.classList.remove(cssClass);
+				};
+
+				// salva la posizione SOLO prima di unload (reload incluso)
+				window.addEventListener("beforeunload", () => {
+
+					sessionStorage.setItem(storageKey, String(window.scrollY));
+				});
+
+				// al pageshow vedo se utilizzare la precedente posizione dello scroll. pageshow più immediato di DOMContentLoad
+				window.addEventListener("pageshow", () => {
+
+					// restore solo su reload
+					const navType = getNavType();
+					if (navType !== "reload") return;
+
+					let scrollVerticalPosition;
+
+					scrollVerticalPosition = sessionStorage.getItem(storageKey);
+
+					if (scrollVerticalPosition === null) return;
+
+					const scrollValue = Number(scrollVerticalPosition);
+
+					if (Number.isFinite(scrollValue) === false) return;
+
+					// evita riutilizzi futuri su altre navigazioni
+					sessionStorage.removeItem(storageKey);
+
+					noSmoothStyle();
+					addNoSmooth();
+
+					// aspetta layout + repaint
+					requestAnimationFrame(() => {
+
+						requestAnimationFrame(() => {
+
+							window.scrollTo(0, scrollValue);
+
+							// riabilita smooth subito dopo il restore
+							requestAnimationFrame(() => {
+
+								removeNoSmooth();
+							});
+						});
+					});
+				});
+
+			})();
+		</script>
+	`;
+};
+
+/**
+ * The function `getNotifyVisibility` returns a script that listens for page show events and modifies the visibility of an element based on its content.
+ * @returns it returns a script that listens for the "pageshow" event and creates a MutationObserver to check for the presence of an element id "__bs_notify__".
+ * If the element exists and its text content does not include "Browsersync: connected", it sets the visibility of the element to "visible" after a delay of 500 ms
+ *
+ *  Questa cagata è stata fatta perchè quella merda di browsersync non permette di nascondere la notifica "connected" dopo il reload e lasciare le altre attive. Mortacci tua!
+ */
+const getNotifyVisibility = () => {
+	return `
+		<script>
+			(function () {
+				window.addEventListener("pageshow", () => {
+					const observer = new MutationObserver(() => {
+						const el = document.getElementById("__bs_notify__");
+						if (el && el.textContent.includes("Browsersync: connected") === false) {
+							setTimeout(() => {
+								el.style.setProperty("visibility", "visible", "important");
+								}, 500);
+							observer.disconnect();
+						}
+					});
+					observer.observe(document.body, {
+						"childList": true,
+						"subtree": true
+					});
+				});
+			})();
+		</script>
+	`;
+};
+
+/**
+ * The function `devSnippetWrapper` combines three different functions related to scroll restoration and visibility notification.
+ * @returns It is returning the concatenated results of three function calls: `getFirefoxScrollRestore()`, `getScrollRestore()`, and `getNotifyVisibility()`.
+ */
+const devSnippetWrapper = () => {
+	return (
+		getFirefoxScrollRestore() +
+		getScrollRestore() +
+		getNotifyVisibility()
+	);
+};
+
+/**
  * `getSnippetOptions` returns an object with a rule that matches a closing `</body>` tag in HTML and appends a script to hide a specific element when Browsersync is connected.
  * @returns it returns an object with a `rule` property. The `rule` property contains an object with `match` and `fn` properties.
  * The `match` property is a regular expression that matches `</body>` case-insensitively.
- *
- *  Questa cagata è stata fatta perchè quella merda di browsersync non permette di nascondere la notifica "connected" e lasciare le altre attive. Mortacci tua!
  */
 const getSnippetOptions = () => {
 	return {
 		"rule": {
 			"match": /<\/body>/i,
 			"fn": (snippet, match) => {
-				const script = `
-					<script>
-						document.addEventListener("DOMContentLoaded", () => {
-							const observer = new MutationObserver(() => {
-								const el = document.getElementById("__bs_notify__");
-								if (el && el.textContent.includes("Browsersync: connected")) {
-									el.style.display = "none";
-									observer.disconnect();
-								}
-							});
-							observer.observe(document.body, {
-								"childList": true,
-								"subtree": true
-							});
-						});
-					</script>`;
+
+				const script = devSnippetWrapper();
+
+				// IMPORTANTE: metto il tuo script PRIMA dello snippet di BS,
+				// così i listener sono pronti quando BS parte.
 				return script + snippet + match;
 			}
 		}

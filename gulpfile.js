@@ -2,13 +2,13 @@
  * @preserve
  * Filename: gulpfile.js
  *
- * Created: 05/05/2025 (12:19:26)
+ * Created: 04/03/2026 (17:54:36)
  * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Last Updated: 05/05/2025 (12:19:26)
+ * Last Updated: 04/03/2026 (17:54:36)
  * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Copyleft: 2025 - Tutti i diritti riservati
+ * Copyleft: 2026 - Tutti i diritti riservati
  *
  * Comments:
  */
@@ -64,6 +64,12 @@ const cli = yargs(hideBin(process.argv))
 		"type": "string",
 		"description": "Server da utilizzare: integrato oppure proxy",
 		"default": "standalone"
+	})
+	.option("clean", {
+		"alias": "c",
+		"type": "boolean",
+		"description": "Cancella la cartella dist/assets di destinazione",
+		"default": false
 	})
 	.argv;
 
@@ -145,7 +151,7 @@ const needSourcemap = (filepath, type = "css") => {
  */
 const removeSourcemap = async () => {
 
-	bundleUtil.toLog("e{clock} [gulp] rimuovo i file mappa...", bundleConf.showLog);
+	bundleUtil.toLog("e{clock} [gulp] rimozione i file mappa...", bundleConf.showLog, "fg{green}");
 
 	// decido come cancellare le mappe js e css
 	let deleteMapArray;
@@ -167,12 +173,73 @@ const removeSourcemap = async () => {
 
 	if (deletedPath.length > 0) {
 
-		bundleUtil.toLog(`e{yeah} [gulp] rimossi ${deletedPath.length} file mappa`, bundleConf.showLog);
+		bundleUtil.toLog(`e{yeah} [gulp] rimossi ${deletedPath.length} file mappa`, bundleConf.showLog, "fg{green}");
 
 	} else {
 
-		bundleUtil.toLog("e{info} [gulp] nessun file mappa da rimuovere", bundleConf.showLog);
+		bundleUtil.toLog("e{info} [gulp] nessun file mappa da rimuovere", bundleConf.showLog, "fg{yellow}");
 	}
+};
+
+/**
+ * The function `copyAssets` copies the assets folder to a specified destination path, with error handling and logging.
+ *
+ * utile per chi lavora sul backend e deve copiare i file assets tra 2 progetti
+ */
+const copyAssets = async () => {
+
+	let localConf = {};
+
+	try {
+
+		localConf = require("./_bundler/bundler.local.js");
+
+	} catch (err) {
+
+		localConf = {};
+	}
+
+	if (localConf.destAssetsPath === "") {
+
+		bundleUtil.toLog("e{forbidden} [gulp] per copiare la cartella \"assets\" è necessario configurare il file \"bundler.local.js\"", true, "fg{red}");
+		return;
+	}
+
+	// normalizzo outputDir per passare da "./dist" a "dist"
+	const sourceOutput = path.normalize(bundleConf.outputDir).replace(/^[.][/\\]/, "");
+	const destPath = path.normalize(localConf.destAssetsPath);
+
+	const pathExists = fs.existsSync(destPath);
+	const isDirectory = pathExists === true ? fs.statSync(destPath).isDirectory() : false;
+
+	if (pathExists === false || isDirectory === false) {
+
+		bundleUtil.toLog("e{finger} [gulp] il path inserito non è corretto oppure non è una directory", true);
+		return;
+	}
+
+	bundleUtil.toLog("e{clock} [gulp] inizio copia della cartella \"assets\" su ${destPath}", true);
+
+	if (cli.clean) {
+
+		await deleteAsync([`${destPath}/assets`], {
+			"force": true
+		});
+
+		bundleUtil.toLog("e{ok} [gulp] cancellazione della cartella destinazione \"assets\" completata", true);
+	}
+
+	return gulp.src(`${sourceOutput}/${bundleConf.outputDirAssets}/**/*`, {
+		"base": sourceOutput,
+		"allowEmpty": true
+	})
+		.pipe(gulp.dest(destPath))
+		.on("error", (err) => {
+			bundleUtil.toLog(`e{error} [gulp] errore copia assets: ${err.message}`, true);
+		})
+		.on("end", () => {
+			bundleUtil.toLog("e{yeah} [gulp] copia della cartella \"assets\" completata", true);
+		});
 };
 
 /**
@@ -243,52 +310,51 @@ const revisioningAssets = async () => {
 };
 
 /**
- * The `sizeAssets` function calculates and displays the final sizes of CSS and JS assets in a project.
- * @returns it returns a Promise that resolves when the size calculation for CSS and JS assets is completed.
+ * The function `sizeCssStream` checks for the existence of a CSS folder, then streams and calculates the size of CSS files in that folder with gzip compression.
+ * @returns A Promise is being returned.
  */
-const sizeAssets = () => {
+const sizeCssStream = () => {
 
-	bundleUtil.toLog("e{info} [gulp] calcolo peso dei file css e js", bundleConf.showLog);
+	if (fs.existsSync(fullCssPath) === false) {
 
-	// calcolo il peso dei file css
-	const sizeCssStream = () => {
+		bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullCssPath} non trovata`, bundleConf.showLog, "fg{red}");
+		return Promise.resolve();
+	}
 
-		// se la cartella esiste, calcola il peso dei file css
-		if (fs.existsSync(fullCssPath)) {
-
-			return gulp.src(`${fullCssPath}/**/*.css`)
-				.pipe(size({
-					"title": "CSS (gzip)",
-					"gzip": true,
-					"pretty": true
-				}));
-		}
-
-		return Promise.resolve(bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullCssPath} non trovata`, bundleConf.showLog));
-	};
-
-	// calcolo il peso dei file js
-	const sizeJsStream = () => {
-
-		// se la cartella esiste, calcola il peso dei file css
-		if (fs.existsSync(fullJsPath)) {
-
-			return gulp.src(`${fullJsPath}/**/*.js`)
-				.pipe(size({
-					"title": "JS (no gzip)",
-					"gzip": false,
-					"pretty": true
-				}));
-		}
-
-		return Promise.resolve(bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullCssPath} non trovata`, bundleConf.showLog));
-	};
-
-	return Promise.all([
-		sizeCssStream(),
-		sizeJsStream()
-	]);
+	return gulp.src(`${fullCssPath}/**/*.css`, {
+		"allowEmpty": true
+	}).pipe(size({
+		"title": "CSS (gzip)",
+		"gzip": true,
+		"pretty": true
+	}));
 };
+
+/**
+ * The function `sizeJsStream` checks if a JavaScript file exists, logs a message if it doesn't, and then calculates the size of the JavaScript files in a specified path.
+ * @returns A Promise is being returned.
+ */
+const sizeJsStream = () => {
+
+	if (fs.existsSync(fullJsPath) === false) {
+
+		bundleUtil.toLog(`e{forbidden} [gulp] cartella ${fullJsPath} non trovata`, bundleConf.showLog, "fg{red}");
+		return Promise.resolve();
+	}
+
+	return gulp.src(`${fullJsPath}/**/*.js`, {
+		"allowEmpty": true
+	}).pipe(size({
+		"title": "JS (no gzip)",
+		"gzip": true,
+		"pretty": true
+	}));
+};
+
+/* It's defining a Gulp task called `sizeAssets` that runs two other Gulp tasks in series: `sizeCssStream` and `sizeJsStream`.
+ * This means that `sizeCssStream` will run first, followed by `sizeJsStream`.
+ */
+const sizeAssets = gulp.series(sizeCssStream, sizeJsStream);
 
 /**
  * The function `selectiveSassPlugin` dynamically creates a list of SCSS plugins based on configuration options such as enabling autoprefixer and minifying CSS for production.
@@ -352,8 +418,7 @@ const createSassCompileStream = (filelist, pluginlist, withmap = false) => {
 
 	let stream = gulp.src(filelist, {
 		"base": bundleConf.srcSass
-	})
-		.pipe(plumber({ "errorHandler": errorHandler }));
+	}).pipe(plumber({ "errorHandler": errorHandler }));
 
 	// aggiungo sourcemaps solo se richiesto
 	if (withmap) {
@@ -545,7 +610,6 @@ const compileSass = (currentfile = null) => {
 	}
 };
 
-
 /**
  * The function `compileJs` asynchronously compiles JavaScript code using esbuild and reloads the browser
  */
@@ -689,8 +753,11 @@ const runPurgeCss = () => {
 const serveProxy = (done) => {
 
 	const bsOption = {
-		"proxy": bundleConf.proxy.url,
-		"startPath": bundleConf.proxy.baseDir,
+		"server": {
+			"baseDir": bundleConf.proxy.baseDir,
+			"directory": bundleConf.server.showDir
+		},
+		"startPath": bundleConf.proxy.startPath,
 		"port": bundleConf.proxy.port,
 		"open": cli.open,
 		"files": bundleUtil.getObservedFilePath(),
@@ -700,7 +767,8 @@ const serveProxy = (done) => {
 		"online": true,
 		"reloadOnRestart": true,
 		"reloadDebounce": bundleConf.delayReloadBrowserSync,
-		"scrollRestoreTechnique": "cookie",
+		// c'è una funziona specifica che pensa al restore dello scroll perchè con firefox c'erano problemi
+		"scrollRestoreTechnique": false,
 		"ghostMode": {
 			"clicks": false,
 			"scroll": false,
@@ -708,10 +776,7 @@ const serveProxy = (done) => {
 		}
 	};
 
-	if (bundleConf.showErrorOverlay) {
-
-		bsOption["snippetOptions"] = bundleUtil.getSnippetOptions();
-	}
+	bsOption["snippetOptions"] = bundleUtil.getSnippetOptions();
 
 	browserSync.init(bsOption);
 	done();
@@ -740,6 +805,8 @@ const serveStandalone = (done) => {
 		"online": true,
 		"reloadOnRestart": true,
 		"reloadDebounce": bundleConf.delayReloadBrowserSync,
+		// c'è una funziona specifica che pensa al restore dello scroll perchè con firefox c'erano problemi
+		"scrollRestoreTechnique": false,
 		"ghostMode": {
 			"clicks": false,
 			"scroll": false,
@@ -747,10 +814,7 @@ const serveStandalone = (done) => {
 		}
 	};
 
-	if (bundleConf.showErrorOverlay) {
-
-		bsOption["snippetOptions"] = bundleUtil.getSnippetOptions();
-	}
+	bsOption["snippetOptions"] = bundleUtil.getSnippetOptions();
 
 	if (isServeMode) {
 
@@ -842,10 +906,11 @@ const dev = gulp.series(
 const compileOnly = gulp.parallel(compileSass, compileJs);
 
 // export tasks
+exports.default = dev;
+exports.copyAssets = copyAssets;
 exports.sass = compileSass;
 exports.js = compileJs;
 exports.build = build;
-exports.default = dev;
 exports.compile = compileOnly;
 exports.serveProxy = serveProxy;
 exports.serveStandalone = serveStandalone;

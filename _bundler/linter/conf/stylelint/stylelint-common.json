@@ -1,0 +1,113 @@
+{
+	"extends": "stylelint-config-standard-scss",
+	"rules": {
+		"alpha-value-notation": null,
+		"annotation-no-unknown": [
+			true, {
+				"ignoreAnnotations": [
+					"default"
+				]
+			}
+		],
+		"at-rule-empty-line-before": null,
+		"color-named": "never",
+		"color-function-notation": null,
+		"color-no-invalid-hex": true,
+		"comment-empty-line-before": null,
+		"custom-property-empty-line-before": null,
+		"declaration-empty-line-before": null,
+		"declaration-property-value-no-unknown": [
+			true, {
+				"ignoreProperties": {
+					"/.+/": "/util.v(.+)/"
+				}
+			}
+		],
+		"font-family-name-quotes": "always-unless-keyword",
+		"font-family-no-duplicate-names": true,
+		"font-weight-notation": "numeric",
+		"keyframe-block-no-duplicate-selectors": null,
+		"keyframe-declaration-no-important": true,
+		"media-feature-range-notation": "prefix",
+		"no-descending-specificity": null,
+		"no-duplicate-at-import-rules": true,
+		"no-irregular-whitespace": true,
+		"property-no-vendor-prefix": null,
+		"property-no-unknown": true,
+		"scss/at-else-empty-line-before": null,
+		"scss/at-if-no-null": null,
+		"scss/at-mixin-argumentless-call-parentheses": "always",
+		"scss/at-rule-conditional-no-parentheses": null,
+		"scss/dollar-variable-colon-space-after": "always-single-line",
+		"scss/dollar-variable-empty-line-before": null,
+		"scss/dollar-variable-pattern": null,
+		"scss/double-slash-comment-empty-line-before": null,
+		"scss/load-no-partial-leading-underscore": null,
+		"scss/partial-no-import": true,
+		"selector-attribute-quotes": "always",
+		"selector-class-pattern": null,
+		"selector-not-notation": "complex",
+		"selector-pseudo-element-colon-notation": null,
+		"selector-type-case": "lower",
+		"shorthand-property-no-redundant-values": true,
+		"string-no-newline": true,
+		"unit-disallowed-list": [
+			"em",
+			"pt",
+			"in",
+			"pc"
+		],
+		"value-keyword-case": "lower",
+		"value-no-vendor-prefix": null,
+		"@stylistic/at-rule-name-case": "lower",
+		"@stylistic/at-rule-semicolon-newline-after": "always",
+		"@stylistic/at-rule-semicolon-space-before": "never",
+		"@stylistic/selector-attribute-brackets-space-inside": "never",
+		"@stylistic/block-closing-brace-empty-line-before": null,
+		"@stylistic/block-closing-brace-newline-after": "always",
+		"@stylistic/block-closing-brace-newline-before": "always",
+		"@stylistic/block-opening-brace-newline-after": "always",
+		"@stylistic/block-opening-brace-newline-before": "always",
+		"@stylistic/block-opening-brace-space-before": null,
+		"@stylistic/color-hex-case": "lower",
+		"@stylistic/declaration-bang-space-after": "never",
+		"@stylistic/declaration-block-semicolon-newline-after": "always",
+		"@stylistic/declaration-block-trailing-semicolon": "always",
+		"@stylistic/function-parentheses-space-inside": "never",
+		"@stylistic/indentation": "tab",
+		"@stylistic/max-line-length": null,
+		"@stylistic/media-feature-colon-space-after": "always",
+		"@stylistic/media-feature-colon-space-before": "never",
+		"@stylistic/media-feature-name-case": "lower",
+		"@stylistic/media-feature-range-operator-space-after": "always",
+		"@stylistic/media-feature-range-operator-space-before": "always",
+		"@stylistic/no-empty-first-line": true,
+		"@stylistic/no-extra-semicolons": true,
+		"@stylistic/number-leading-zero": "always",
+		"@stylistic/property-case": "lower",
+		"@stylistic/selector-list-comma-newline-after": "always",
+		"@stylistic/selector-list-comma-newline-before": "never-multi-line",
+		"@stylistic/selector-pseudo-class-case":"lower",
+		"@stylistic/selector-pseudo-class-parentheses-space-inside": "never",
+		"@stylistic/selector-pseudo-element-case": "lower",
+		"@stylistic/unit-case": "lower",
+		"@stylistic/value-list-max-empty-lines": 2,
+		"order/order": [
+			[
+				"custom-properties",
+				"declarations",
+				"less-mixins",
+				"at-variables",
+				{
+					"type": "at-rule",
+					"name": "include"
+				},
+				"rules"
+			]
+		]
+	},
+  	"plugins": [
+		"stylelint-order",
+		"@stylistic/stylelint-plugin"
+	]
+}

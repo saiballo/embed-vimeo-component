@@ -2,24 +2,24 @@
  * @preserve
  * Filename: esbuild.config.js
  *
- * Created: 05/05/2025 (12:19:26)
+ * Created: 04/03/2026 (17:54:36)
  * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Last Updated: 05/05/2025 (12:19:26)
+ * Last Updated: 04/03/2026 (17:54:36)
  * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Copyleft: 2025 - Tutti i diritti riservati
+ * Copyleft: 2026 - Tutti i diritti riservati
  *
  * Comments:
  */
 
-const alias = require("esbuild-plugin-alias");
+// opzionale per quei plugin UMD che fanno il require di jquery. l'alternativa è installare jquery con npm anche se non lo si usa. abilitare plugin più sotto
+// const alias = require("esbuild-plugin-alias");
 const esbuild = require("esbuild");
 const fg = require("fast-glob");
 const path = require("node:path");
 const { minifyTemplates, writeFiles } = require("esbuild-minify-templates");
 const { replace } = require("esbuild-plugin-replace");
-
 // conf import e utils
 const bundleConf = require("./_bundler/bundler.config.js");
 const bundleUtil = require("./_bundler/bundler.util.js");
@@ -87,20 +87,20 @@ const buildFile = async (entrypath) => {
 		// necessario per far funzionare minifyTemplate per i css
 		"write": false,
 		"plugins": [
-			// alias per jquery in caso servisse
-			alias({
-    			jquery: path.resolve(__dirname, `${bundleConf.outputDir}/${bundleConf.outputDirAssets}/vendor/jquery/jquery-3.7.1.min.js`)
-  			}),
+			// alias per jquery in caso servisse. controllare versione caricata
+			// alias({
+			// "jquery": path.resolve(__dirname, `${bundleConf.outputDir}/${bundleConf.outputDirAssets}/vendor/jquery/jquery-3.7.1.min.js`)
+			// }),
 			replace({
 				"values": bundleUtil.getAllEnvironmentVar(),
 				"preventAssignment": true
 			}),
 			// il plugin serve per minificare i template css dentro i js cosa che non fa esbuild di default
-			...(bundleConf.isProduction ? [minifyTemplates()] : []),
+			...bundleConf.isProduction ? [minifyTemplates()] : [],
 			// al posto di write di esbuild metto il plugin writeFiles che scrive i file minificati
 			writeFiles()
 		]
-	})
+	});
 };
 
 /**

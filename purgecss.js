@@ -2,13 +2,13 @@
  * @preserve
  * Filename: purgecss.js
  *
- * Created: 05/05/2025 (12:19:26)
+ * Created:	04/03/2026 (17:54:36)
  * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Last Updated: 05/05/2025 (12:19:26)
+ * Last update:	04/03/2026 (17:54:36)
  * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
  *
- * Copyleft: 2025 - Tutti i diritti riservati
+ * Copyleft: 2026 - Tutti i diritti riservati
  *
  * Comments: purgeCss non prevede un array per il parametro "output". è possibile assegnare un nome specifico al file di output solo quando "input" è uno soltanto. nel caso di array per "input" il parametro "output" deve essere una directory
  */
@@ -73,7 +73,7 @@ const getCssList = () => {
  */
 const collectSassFileList = (excludesinglecss) => {
 
-	if (!excludesinglecss) return false;
+	if (!excludesinglecss) return [];
 
 	// lista delle cartelle da escludere
 	const excludeFolderList = bundleConf.sassPartialFolderList || [];
@@ -140,8 +140,8 @@ const touch = (filepath) => {
 /**
  * The function `normalizePaths` takes an array of paths and a base directory, and replaces paths starting with a specific directory with absolute paths.
  * @param patharray - An array of file paths that may need to be normalized.
- * @param basedir - it represents the base directory path that will be used to normalize the paths in the `pathsArray`.
- * @returns The `normalizePaths` function takes an array of paths (`pathsArray`) and a base directory (`baseDir`) as input.
+ * @param basedir - it represents the base directory path that will be used to normalize the paths in the `pathsarray`.
+ * @returns The `normalizePaths` function takes an array of paths (`pathsarray`) and a base directory (`basedir`) as input.
  * It then maps over each path in the array and checks if the path starts with the output directory specified in `bundleConf.outputDir`.
  * If a path starts with the output directory, it removes the initial dot and joins the base directory with the modified path.
  *
@@ -163,6 +163,56 @@ const normalizePathList = (patharray, basedir) => {
 	});
 };
 
+/**
+ * The `writePurgeClassList` function writes a list of rejected selectors from PurgeCSS to a text file in a specified directory.
+ * @param purgecss - The function takes an array `purgecss` as a parameter. This array contains objects with information about the purged CSS selectors.
+ * The function then processes this data to extract the rejected CSS selectors and writes them to a text file for reporting purposes.
+ */
+const writePurgeClassList = (purgecss) => {
+
+	// output dir del file purge normalize:
+	const outputPurgeDir = path.normalize(`${workingDir}/${bundleConf.purgeFileRemovedFolder}`);
+	const reportList = [];
+
+	for (const result of purgecss) {
+
+		if (Array.isArray(result.rejected) === false || result.rejected.length === 0) continue;
+
+		// conteggio rimozioni
+		const removedCount = result.rejected.length;
+		// titolo e instazione
+		const title = `### FILE RIFERIMENTO: ${result.file} (${removedCount} rimozioni)`;
+		const separator = "#".repeat(title.length);
+
+		// intestazione file
+		reportList.push(separator);
+		reportList.push(title);
+		reportList.push(separator);
+
+		for (const selector of result.rejected) {
+
+			reportList.push(selector);
+		}
+
+		// riga vuota di separazione
+		reportList.push("");
+	}
+
+	if (reportList.length === 0) return;
+
+	// crea la cartella se non esiste
+	fs.mkdirSync(outputPurgeDir, {
+		"recursive": true
+	});
+
+	const reportPath = path.join(outputPurgeDir, "purgecss-rejected.txt");
+
+	fs.writeFileSync(reportPath, reportList.join("\n"), "utf8");
+
+	bundleUtil.toLog(`e{checkmark} [purgecss] report selettori salvato in: ${reportPath}`, bundleConf.showLog, "fg{cyan}");
+
+};
+
 const init = async () => {
 
 	try {
@@ -172,7 +222,7 @@ const init = async () => {
 
 		if (cssFileList.length === 0) {
 
-			bundleUtil.toLog("e{info} [purgecss] nessun file css da ottimizzare", bundleConf.showLog);
+			bundleUtil.toLog("e{info} [purgecss] nessun file css da ottimizzare", bundleConf.showLog, "fg{yellow}");
 
 			return false;
 		}
@@ -203,7 +253,8 @@ const init = async () => {
 						]
 					},
 					"keyframes": false,
-					"variables": false
+					"variables": false,
+					"rejected": bundleConf.purgeCssConfig?.rejected || false
 				};
 
 				const purgeCss = await new PurgeCSS().purge(purgeConfig);
@@ -214,7 +265,11 @@ const init = async () => {
 					fs.writeFileSync(result.file, result.css);
 				}
 
-				bundleUtil.toLog("e{info} [purgecss] purge terminato", bundleConf.showLog);
+				// scrivo la lista delle classi purgiate se richiesto
+				if (purgeConfig.rejected) {
+
+					writePurgeClassList(purgeCss);
+				}
 
 				return true;
 			}
@@ -239,9 +294,9 @@ const init = async () => {
 
 	} catch (err) {
 
-		bundleUtil.toLog(`e{forbidden} [purgecss] errore durante l'esecuzione di PurgeCSS: ${err.message}`, true);
+		bundleUtil.toLog(`e{forbidden} [purgecss] errore durante l'esecuzione di PurgeCSS: ${err.message}`, true, "fg{red}");
 
-		throw new Error(err);
+		throw new Error(String(err));
 	}
 };
 
