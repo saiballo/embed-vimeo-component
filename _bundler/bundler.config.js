@@ -106,9 +106,9 @@ const config = {
 	get "server"() {
 
 		return {
-			"baseDir": this.outputDir,
+			"baseDir": "./",
 			"port": 8852,
-			"showDir": false
+			"showDir": true
 		};
 	},
 	// configurazione per PurgeCSS

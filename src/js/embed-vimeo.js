@@ -5,7 +5,7 @@
 * Created: 08/05/2025 (12:55:59)
 * Created by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
-* Last update: 04/03/2026 (18:41:12)
+* Last update: 05/03/2026 (16:53:17)
 * Updated by: Lorenzo Saibal Forti <lorenzo.forti@gmail.com>
 *
 * Copyleft: 2025 - Tutti i diritti riservati
@@ -25,6 +25,27 @@ class EmbedVimeo extends HTMLElement {
 	// controllo globale dell'event listener visibility
 	static visibilityListenerInit = false;
 
+	static get observedAttributes() {
+
+		return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
+	}
+
+	static loadVisibilityListener() {
+
+		if (this.visibilityListenerInit === true) return;
+
+		this.visibilityListenerInit = true;
+
+		document.addEventListener("visibilitychange", () => {
+
+			if (document.hidden === false) return;
+
+			this.instanceList.forEach((instance) => {
+				instance.pauseVideo();
+			});
+		});
+	}
+
 	constructor() {
 
 		super();
@@ -37,6 +58,7 @@ class EmbedVimeo extends HTMLElement {
 
 		this.scheduleUpdate = null;
 		this.isIframeLoaded = false;
+		this.listenerInit = false;
 		// prendo il currentScript per leggere alcuni parametri globali ma solo se non è type="module" atrlimenti leggo il body
 		this.globalParam = document.currentScript || document.getElementsByTagName("body")[0];
 		// inizializzo il codice e gli stili css
@@ -47,9 +69,9 @@ class EmbedVimeo extends HTMLElement {
 	get videoId() {
 
 		const rawId = this.getAttribute("video-id") || "";
-		const id = normalizeVideoId(rawId);
+		const id = encodeURIComponent(normalizeVideoId(rawId));
 
-		return encodeURIComponent(id);
+		return id;
 	}
 
 	get videoTitle() {
@@ -134,27 +156,6 @@ class EmbedVimeo extends HTMLElement {
 	}
 	// has attributi locali del component
 
-	static get observedAttributes() {
-
-		return ["video-id", "video-title", "play-text", "poster-url", "poster-fallback", "mute"];
-	}
-
-	static loadVisibilityListener() {
-
-		if (this.visibilityListenerInit === true) return;
-
-		this.visibilityListenerInit = true;
-
-		document.addEventListener("visibilitychange", () => {
-
-			if (document.hidden === false) return;
-
-			this.instanceList.forEach((instance) => {
-				instance.pauseVideo();
-			});
-		});
-	}
-
 	connectedCallback() {
 
 		// se non c'è l'id del video allora non carico il component
@@ -163,21 +164,26 @@ class EmbedVimeo extends HTMLElement {
 		// setup del componente
 		this.setupComponent();
 
-		// evento click per creare l'iframe
-		this.addEventListener("click", () => {
+		if (this.listenerInit === false) {
 
-			this.loadIframe();
-		});
+			// evento click per creare l'iframe
+			this.addEventListener("click", () => {
 
-		// preload delle connessioni
-		this.addEventListener("pointerover", () => {
+				this.loadIframe();
+			});
 
-			preloadConnection(this);
+			// preload delle connessioni
+			this.addEventListener("pointerover", () => {
 
-		}, {
+				preloadConnection(this);
 
-			"once": true
-		});
+			}, {
+
+				"once": true
+			});
+
+			this.listenerInit = true;
+		}
 
 		// registra istanza singolo video su static. in alternativa va bene anche il nome della classe ma è meno flessibile: EmbedYouTube.instances
 		this.constructor.instanceList.add(this);
@@ -192,6 +198,9 @@ class EmbedVimeo extends HTMLElement {
 	 * The `setupComponent` sets up various properties and behaviors for a video component, including setting labels, custom posters, auto-loading iframes etc.
 	 */
 	setupComponent() {
+
+		// cleanup observer precedenti (setup può essere richiamata più volte)
+		this.cleanupObservers();
 
 		// costruisco la label a seconda dei dati presenti
 		const label = setLabel(this);
@@ -243,43 +252,89 @@ class EmbedVimeo extends HTMLElement {
 		}
 	}
 
+	/**
+	 * The function `cleanupObservers` disconnects any existing observers for iframe and video elements and sets them to null.
+	 */
+	cleanupObservers() {
+
+		this.observerIframe?.disconnect();
+		this.observerVideo?.disconnect();
+		this.observerIframe = null;
+		this.observerVideo = null;
+	}
+
 	createIframe() {
 
-		let videoParam;
+		const iframe = document.createElement("iframe");
+
+		iframe.title = typeof this.videoTitle === "string" ? this.videoTitle : this.config.textVideoTitle;
+		iframe.setAttribute("allowfullscreen", "");
+		iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; playsinline");
+
+		const iframeUrl = new URL(`https://player.vimeo.com/video/${String(this.videoId)}`);
 
 		// se ci sono parametri custom tutti i default vengono azzerati
 		if (this.paramList && this.paramList !== "") {
 
-			videoParam = this.paramList;
+			const cleaned = String(this.paramList).trim().replace(/^\?/, "").replace(/^&/, "");
+			const [queryPart = "", hashPart = ""] = cleaned.split("#");
+			const customParams = new URLSearchParams(queryPart);
+
+			const allowed = new Set([
+				"autopause",
+				"autoplay",
+				"background",
+				"byline",
+				"color",
+				"controls",
+				"dnt",
+				"h",
+				"keyboard",
+				"loop",
+				"muted",
+				"pip",
+				"portrait",
+				"quality",
+				"speed",
+				"texttrack",
+				"title",
+				"transparent"
+			]);
+
+			for (const [key, value] of customParams.entries()) {
+
+				if (allowed.has(key)) {
+
+					iframeUrl.searchParams.set(key, value);
+				}
+			}
+
+			// supporto opzionale per hast time #t=
+			const hashParams = new URLSearchParams(hashPart);
+
+			const time = hashParams.get("t");
+
+			if (time) iframeUrl.hash = `t=${encodeURIComponent(time)}`;
 
 		} else {
 
-			// gestione parametri
-			const noTRacking = this.noTracking ? 1 : 0;
-			const autoplay = this.autoPlay && this.autoLoad || !this.autoPlay && !this.autoLoad ? 1 : 0;
-			const muted = this.mute ? 1 : 0;
+			const noTracking = this.noTracking ? 1 : 0;
+			// autoplay attivo quando autoPlay e autoLoad sono entrambi true o entrambi false
+			const autoplay = (this.autoPlay === this.autoLoad) ? 1 : 0;
+			const muted = (autoplay === 1 && this.autoPlay) ? 1 : (this.mute ? 1 : 0);
 			const startAt = this.videoStartAt;
 
-			videoParam = `dnt=${noTRacking}&transparent=1&title=0&${videoParam}&autoplay=${autoplay}`;
-
-			// la gestione dell'autoplay di vimeo è diversa da youtube
-			if (autoplay && this.autoPlay) {
-
-				videoParam = `${videoParam}&muted=1`;
-
-			} else {
-
-				videoParam = `${videoParam}&muted=${muted}`;
-			}
-
-			videoParam = `${videoParam}#t=${startAt}`;
+			iframeUrl.searchParams.set("dnt", String(noTracking));
+			iframeUrl.searchParams.set("transparent", "1");
+			iframeUrl.searchParams.set("title", "0");
+			iframeUrl.searchParams.set("autoplay", String(autoplay));
+			iframeUrl.searchParams.set("muted", String(muted));
+			iframeUrl.hash = `t=${encodeURIComponent(String(startAt))}`;
 		}
 
-		const iframeCode = `
-			<iframe title="vimeo-player" src="https://player.vimeo.com/video/${this.videoId}?${videoParam}" frameborder="0" allowfullscreen allow="autoplay; fullscreen; picture-in-picture"></iframe>
-		`;
+		iframe.src = iframeUrl.toString();
 
-		return iframeCode;
+		return iframe;
 	}
 
 	/**
@@ -289,8 +344,8 @@ class EmbedVimeo extends HTMLElement {
 
 		if (this.isIframeLoaded === false) {
 
-			const iframeCode = this.createIframe();
-			this.domContainer.insertAdjacentHTML("beforeend", iframeCode);
+			const iframeEl = this.createIframe();
+			this.domContainer.appendChild(iframeEl);
 			this.domContainer.classList.add(this.config.activeIframeClass);
 			this.isIframeLoaded = true;
 
@@ -448,6 +503,10 @@ class EmbedVimeo extends HTMLElement {
 
 		try {
 
+			// pulizia
+			this.domPosterContainer.querySelector("#img-webp")?.remove();
+			this.domPosterContainer.querySelector("#img-jpg")?.remove();
+
 			// url api v2 per recuperare le immagini
 			const apiUrl = `https://vimeo.com/api/v2/video/${this.videoId}.json`;
 
@@ -524,7 +583,7 @@ class EmbedVimeo extends HTMLElement {
 		// se viene cambiato l'attributo videoid allora prendo il valore prima del cambiamento
 		// se viene cambiato un attributo che non è videoid allora prendo il valore presente nel codice
 		// questo si è reso necessario perchè viene usato requestAnimationFrame che accorpa tutte le modifiche in una volta sola
-		const videoId = attrname === "video-id" ? oldvalue : this.videoId;
+		const videoId = attrname === "video-id" ? encodeURIComponent(normalizeVideoId(oldvalue || "")) : this.videoId;
 
 		// cancello eventuali json. lo faccio sempre perchè non so quale attributo possa essere cambiato. in ogni caso viene richiamata la setup che lo riscrive
 		if (this.noSchema === false && this.querySelector(`#json-${videoId}`)) {
@@ -553,8 +612,7 @@ class EmbedVimeo extends HTMLElement {
 	disconnectedCallback() {
 
 		this.constructor?.instanceList.delete(this);
-		this.observerIframe?.disconnect();
-		this.observerVideo?.disconnect();
+		this.cleanupObservers();
 	}
 }
 
